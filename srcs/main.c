@@ -98,7 +98,10 @@ void	get_line(t_minishell *minishell)
 	{
 		path_of_command = get_path_of_command(minishell->environment_path, command[0]);
 		execve(path_of_command, command, NULL);
-		//빌트인 명령 실행 부분으로 넘어가기
+		//execute_builtin(command, fd);  >> make~
+		//fd -> make open fd + a
+		// > make~
+		//빌트인 명령 실행 함수로 넘어가기
 		exit(1);
 	}
 }
