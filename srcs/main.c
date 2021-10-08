@@ -1,22 +1,4 @@
-# include <stdio.h>
-# include <readline/readline.h>
-# include <readline/history.h>
-# include <unistd.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <signal.h>
-# include <string.h>
-# include <sys/wait.h>
-# include <fcntl.h>
-# include <errno.h>
-# include "../Libft/libft.h"
-
-typedef struct s_minishell
-{
-	char	**environment_path;
-	char	*limiter;
-	int		is_here_doc;
-}	t_minishell;
+# include "minishell.h"
 
 void	free_two_dimensional(char **two_dimensional)
 {
@@ -43,7 +25,7 @@ static char	*get_path_of_command(char **environment_path, char *command)
 	end = sizeof(environment_path);
 	path_of_commnad = NULL;
 	while (idx < end)
-	{	
+	{
 		if (access(command, F_OK) == 0)
 			return (command);
 		path_of_commnad = ft_strjoin(environment_path[idx], command);
@@ -62,7 +44,7 @@ static void	add_slash_at_end_of_path(t_minishell *minishell, char **environment_
 
 	idx = 0;
 	while (environment_path[idx])
-	{	
+	{
 		minishell->environment_path[idx] = ft_strjoin(environment_path[idx], "/");
 		idx++;
 	}
@@ -84,12 +66,13 @@ void	set_environment_path(t_minishell *minishell)
 
 void	get_line(t_minishell *minishell)
 {
-	char	*line;	
+	char	*line;
 	char	**command;
-	char	*path_of_commnad;
-	char	current_path[1024];
+	char	*path_of_command;
+	char	*current_path;
 	int		pid;
 	int		exit_status_of_child;
+	char	*str;
 
 	line = NULL;
 	if (line)
@@ -97,26 +80,28 @@ void	get_line(t_minishell *minishell)
 		free(line);
 		line = NULL;
 	}
-	getcwd(current_path, 1024);
-	if (!current_path)
-		exit(1);
-	line = readline("Minishell>");
-	rl_on_new_line();
-	rl_replace_line(current_path, 0);
-	rl_redisplay();
-	command = ft_split(line, ' ');
+	//함수로 따로 따기
+	current_path = getcwd(NULL, 0);//상대경로(마지막 슬래쉬)파싱 함수 만들기
+	str = ft_strjoin("Minishell ", current_path);
+	str = ft_strjoin(str, ">");
+	line = readline(str);
+	command = ft_split(line, ' ');//파싱 함수로 대체
 	if (line)
-		add_history(line);
+		add_history(line);//히스토리 저장은 어디에 되는지?
 	pid = fork();
-	if (pid > 0)
+	if (pid > 0)//자식 프로세스를 기다리는 곳, waitpid함수 실패 시 종료 -> 생각해보기
 	{
 		if (waitpid(pid, &exit_status_of_child, 0) == -1)
 			exit(1);
 	}
 	else if (pid == 0)
 	{
-		path_of_commnad = get_path_of_command(minishell->environment_path, command[0]);
-		execve(path_of_commnad, command, NULL);
+		path_of_command = get_path_of_command(minishell->environment_path, command[0]);
+		execve(path_of_command, command, NULL);
+		//execute_builtin(command, fd);  >> make~
+		//fd -> make open fd + a
+		// > make~
+		//빌트인 명령 실행 함수로 넘어가기
 		exit(1);
 	}
 }
