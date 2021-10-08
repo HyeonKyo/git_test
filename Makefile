@@ -3,10 +3,10 @@ NAME = minishell
 SRCS = ./srcs/main.c
 OBJS = $(SRCS:.c=.o)
 
-INC	= ./inc/
+INC	= ./includes/
 LIBFT = ./Libft/
 CC = gcc
-CFLAGS = -g3 -fsanitize=address -lncurses -lreadline
+CFLAGS = -g3 -fsanitize=address -lreadline -I/usr/local/opt/readline/include -L/usr/local/opt/readline/lib
 #CFLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address -lncurses
 
 all : $(NAME)
@@ -16,9 +16,10 @@ $(NAME) : $(SRCS)
 	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) ./Libft/libft.a -I $(INC)
 
 fclean : clean
+	make clean -C $(LIBFT)
 	rm -rf $(NAME)
 
-clean : 
+clean :
 	rm -rf $(OBJS)
 
 re :
