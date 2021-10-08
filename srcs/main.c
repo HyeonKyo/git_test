@@ -68,10 +68,8 @@ void	get_line(t_minishell *minishell)
 {
 	char	*line;
 	char	**command;
-	char	*path_of_command;
 	char	*current_path;
 	int		pid;
-	int		exit_status_of_child;
 	char	*str;
 
 	line = NULL;
@@ -85,25 +83,15 @@ void	get_line(t_minishell *minishell)
 	str = ft_strjoin("Minishell ", current_path);
 	str = ft_strjoin(str, ">");
 	line = readline(str);
-	command = ft_split(line, ' ');//파싱 함수로 대체
+	minishell->command = (char **)malloc(sizeof(char * ) * 2);
+	*minishell->command = line;
+	*(minishell->command + 1) = NULL;
+	// minishell->command = ft_split(line, ' ');//파싱 함수로 대체
 	if (line)
 		add_history(line);//히스토리 저장은 어디에 되는지?
-	pid = fork();
-	if (pid > 0)//자식 프로세스를 기다리는 곳, waitpid함수 실패 시 종료 -> 생각해보기
-	{
-		if (waitpid(pid, &exit_status_of_child, 0) == -1)
-			exit(1);
-	}
-	else if (pid == 0)
-	{
-		path_of_command = get_path_of_command(minishell->environment_path, command[0]);
-		execve(path_of_command, command, NULL);
-		//execute_builtin(command, fd);  >> make~
-		//fd -> make open fd + a
-		// > make~
-		//빌트인 명령 실행 함수로 넘어가기
-		exit(1);
-	}
+	minishell->number_of_pipeline = 0;
+	execute_shell_command(minishell, minishell->number_of_pipeline);
+	free(minishell->command);
 }
 
 void	sig_handler(int signum)
@@ -122,6 +110,7 @@ int	main(void)
 	char		*line;
 	t_minishell	minishell;
 
+	minishell.environment = NULL;
 	set_environment_path(&minishell);
 	signal(SIGINT, sig_handler);
 	while (1)
