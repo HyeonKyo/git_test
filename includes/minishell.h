@@ -80,6 +80,7 @@ void	free_two_dimensional(char **two_dimensional);
 //builtin
 int		cd(char *path);
 int		pwd(int *fd);
+void	export(char **cmd, t_info *info);
 
 int		error(void);
 void	merror(void *addr);
@@ -88,6 +89,8 @@ void	save_env_values(t_info *info, char **envp);
 
 void	sig_handler(int signo);
 
-void	builtin(t_info *info, int *fd);
+int		builtin(t_info *info, int *fd);
+
+void	free_env_list(char **list);
 
 #endif

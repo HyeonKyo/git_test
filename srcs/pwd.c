@@ -11,16 +11,3 @@ int	pwd(int *fd)
 	free(cur_path);
 	return (NORMAL);
 }
-
-void	builtin(t_info *info, int *fd)
-{
-	char	**cmd;
-	int		cmd_len;
-
-	cmd = ft_split(info->cmd[info->cmd_sequence], ' ');
-	cmd_len = ft_strlen(cmd[0]);
-	if (ft_strncmp(cmd[0], "cd", cmd_len))
-		cd(cmd[1]);
-	else if (ft_strncmp(cmd[0], "pwd", cmd_len))
-		pwd(fd);
-}
