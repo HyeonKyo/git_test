@@ -8,8 +8,8 @@
 */
 
 # include <stdio.h>
-# include <readline/history.h>
-# include <readline/readline.h>
+# include "readline/history.h"
+# include "readline/readline.h"
 # include <unistd.h>
 # include <stdlib.h>
 # include <signal.h>
@@ -17,7 +17,6 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <errno.h>
-# include "readline.h"
 # include "libft.h"
 
 /*
