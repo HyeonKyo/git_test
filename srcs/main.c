@@ -22,7 +22,7 @@ static char	*get_path_of_command(char **environment_path, char *command)
 	return (path_of_commnad);
 }
 
-static void	add_slash_at_end_of_path(t_minishell *minishell, char **environment_path)
+static void	add_slash_at_end_of_path(t_info *info, char **environment_path)
 {
 	int		idx;
 	char	*temp_for_substr;
@@ -30,26 +30,26 @@ static void	add_slash_at_end_of_path(t_minishell *minishell, char **environment_
 	idx = 0;
 	while (environment_path[idx])
 	{
-		minishell->environment_path[idx] = ft_strjoin(environment_path[idx], "/");
+		info->env_path[idx] = ft_strjoin(environment_path[idx], "/");
 		idx++;
 	}
 }
 
-void	set_environment_path(t_minishell *minishell)
+void	set_environment_path(t_info *info)
 {
 	int		idx;
 	char	**environment_path;
 
 	idx = 0;
 	environment_path = ft_split(getenv("PATH"), ':');
-	minishell->environment_path = (char **)malloc(sizeof(char *)
+	info->env_path = (char **)malloc(sizeof(char *)
 		* (sizeof(environment_path) + 1));
-	add_slash_at_end_of_path(minishell, environment_path);
-	minishell->environment_path[sizeof(environment_path)] = NULL;
+	add_slash_at_end_of_path(info, environment_path);
+	info->env_path[sizeof(environment_path)] = NULL;
 	free_two_dimensional(environment_path);
 }
 
-void	get_line(t_minishell *minishell)
+void	get_line(t_info *info)
 {
 	char	*line;
 	char	**command;
@@ -65,17 +65,17 @@ void	get_line(t_minishell *minishell)
 	}
 	//함수로 따로 따기
 	current_path = getcwd(NULL, 0);//상대경로(마지막 슬래쉬)파싱 함수 만들기
-	str = ft_strjoin("Minishell ", current_path);
+	str = ft_strjoin("info ", current_path);
 	str = ft_strjoin(str, ">");
 	line = readline(str);
-	minishell->command = (char **)malloc(sizeof(char * ) * 2);
-	*minishell->command = line;
-	*(minishell->command + 1) = NULL;
-	// minishell->command = ft_split(line, ' ');//파싱 함수로 대체
+	info->cmd = (char **)malloc(sizeof(char * ) * 2);
+	*info->cmd = line;
+	*(info->cmd + 1) = NULL;
+	// info->command = ft_split(line, ' ');//파싱 함수로 대체
 	if (line)
 		add_history(line);//히스토리 저장은 어디에 되는지?
-	minishell->number_of_pipeline = 0;
-	execute_shell_command(minishell, minishell->number_of_pipeline);
+	info->n_pipeline = 0;
+	execute_shell_command(info, info->n_pipeline);
 }
 
 void	sig_handler(int signum)
@@ -92,13 +92,13 @@ void	sig_handler(int signum)
 int	main(int arc, char *arvg[], char *envp[])
 {
 	char		*line;
-	t_minishell	minishell;
+	t_info	info;
 
-	minishell.environment = envp;
-	set_environment_path(&minishell);
+	info.env_list = envp;
+	set_environment_path(&info);
 	signal(SIGINT, sig_handler);
 	while (1)
 	{
-		get_line(&minishell);
+		get_line(&info);
 	}
 }
