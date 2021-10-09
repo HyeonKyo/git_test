@@ -48,18 +48,18 @@ typedef struct s_pipex
 	int		is_here_doc;
 }	t_pipex;
 
-typedef struct s_minishell
+typedef struct s_info
 {
-	char	**environment_path;
-	char	**environment;
-	char	**command;
-	int		command_sequence;
-	int		command_total_number;
-	int		number_of_pipeline;
+	char	**env_path;
+	char	**env_list;
+	char	**cmd;
+	int		cmd_sequence;
+	int		cmd_total_number;
+	int		n_pipeline;
 	char	*infile_name;
 	char	*outfile_name;
 	t_pipex pipex;
-}			t_minishell;
+}			t_info;
 
 /*
 ** =============================================================================
@@ -67,14 +67,14 @@ typedef struct s_minishell
 ** =============================================================================
 */
 
-void	execute_shell_command(t_minishell *minishell, int depth);
-void	input_command_of_pipeline(t_minishell *minishell, int is_redirection);
-void	output_command_of_pipeline(t_minishell *minishell, int is_redirection);
-void	execute_input_command(t_minishell *minishell, char **command, int fd);
-void	execute_output_command(t_minishell *minishell, char **command, int fd);
+void	execute_shell_command(t_info *minishell, int depth);
+void	input_command_of_pipeline(t_info *minishell, int is_redirection);
+void	output_command_of_pipeline(t_info *minishell, int is_redirection);
+void	execute_input_command(t_info *minishell, char **command, int fd);
+void	execute_output_command(t_info *minishell, char **command, int fd);
 void	print_error(char *output_string);
-int		get_fd_will_be_stdin(t_minishell *minishell, int is_redirection);
-int		get_fd_will_be_stdout(t_minishell *minishell, int is_redirection);
+int		get_fd_will_be_stdin(t_info *minishell, int is_redirection);
+int		get_fd_will_be_stdout(t_info *minishell, int is_redirection);
 void	free_two_dimensional(char **two_dimensional);
 
 #endif

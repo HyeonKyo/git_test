@@ -22,7 +22,7 @@ static char	*get_path_of_command(char **environment_path, char *command)
 	return (path_of_commnad);
 }
 
-void	execute_input_command(t_minishell *minishell, char **command, int fd)
+void	execute_input_command(t_info *info, char **command, int fd)
 {
 	int		pid;
 	int		exit_status_of_child;
@@ -38,20 +38,20 @@ void	execute_input_command(t_minishell *minishell, char **command, int fd)
 	}
 	else if (pid == 0)
 	{
-		if (minishell->number_of_pipeline)
+		if (info->n_pipeline)
 		{
 			dup2(fd, 0);
 			close(fd);
 		}
 		path_of_commnad
-			= get_path_of_command(minishell->environment_path, command[0]);
-		execve(path_of_commnad, command, minishell->environment);
+			= get_path_of_command(info->env_path, command[0]);
+		execve(path_of_commnad, command, info->env_list);
 		free(path_of_commnad);
 		print_error(command[0]);
 	}
 }
 
-void	execute_output_command(t_minishell *minishell, char **command, int fd)
+void	execute_output_command(t_info *info, char **command, int fd)
 {
 	int		pid;
 	int		exit_status_of_child;
@@ -68,14 +68,14 @@ void	execute_output_command(t_minishell *minishell, char **command, int fd)
 	}
 	else if (pid == 0)
 	{
-		if (minishell->number_of_pipeline)
+		if (info->n_pipeline)
 		{
 			dup2(fd, 1);
 			close(fd);
 		}
 		path_of_commnad
-			= get_path_of_command(minishell->environment_path, command[0]);
-		execve(path_of_commnad, command, minishell->environment);
+			= get_path_of_command(info->env_path, command[0]);
+		execve(path_of_commnad, command, info->env_list);
 		free(path_of_commnad);
 		print_error(command[0]);
 	}
