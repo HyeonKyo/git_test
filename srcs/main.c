@@ -68,7 +68,10 @@ void	get_line(t_info *info)
 	str = ft_strjoin("info ", current_path);
 	str = ft_strjoin(str, ">");
 	line = readline(str);
+	if (line == NULL)//EOF(ctrl + d)만나면 NULL
+		exit(0);
 	info->cmd = (char **)malloc(sizeof(char * ) * 2);
+	merror(info->cmd);
 	*info->cmd = line;
 	*(info->cmd + 1) = NULL;
 	// info->command = ft_split(line, ' ');//파싱 함수로 대체
@@ -78,25 +81,15 @@ void	get_line(t_info *info)
 	execute_shell_command(info, info->n_pipeline);
 }
 
-void	sig_handler(int signum)
-{
-	if (signum == SIGINT)
-	{
-		printf("\n");
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-}
-
 int	main(int arc, char *arvg[], char *envp[])
 {
-	char		*line;
+	char	*line;
 	t_info	info;
 
-	info.env_list = envp;
+	save_env_values(&info, envp);
 	set_environment_path(&info);
 	signal(SIGINT, sig_handler);
+	signal(SIGQUIT, sig_handler);
 	while (1)
 	{
 		get_line(&info);

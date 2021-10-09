@@ -1,5 +1,5 @@
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#ifndef info_H
+# define info_H
 
 /*
 ** =============================================================================
@@ -67,14 +67,27 @@ typedef struct s_info
 ** =============================================================================
 */
 
-void	execute_shell_command(t_info *minishell, int depth);
-void	input_command_of_pipeline(t_info *minishell, int is_redirection);
-void	output_command_of_pipeline(t_info *minishell, int is_redirection);
-void	execute_input_command(t_info *minishell, char **command, int fd);
-void	execute_output_command(t_info *minishell, char **command, int fd);
+int		execute_shell_command(t_info *info, int depth);
+void	input_command_of_pipeline(t_info *info, int is_redirection);
+void	output_command_of_pipeline(t_info *info, int is_redirection);
+void	execute_input_command(t_info *info, char **command, int fd);
+void	execute_output_command(t_info *info, char **command, int fd);
+int		get_fd_will_be_stdin(t_info *info, int is_redirection);
+int		get_fd_will_be_stdout(t_info *info, int is_redirection);
 void	print_error(char *output_string);
-int		get_fd_will_be_stdin(t_info *minishell, int is_redirection);
-int		get_fd_will_be_stdout(t_info *minishell, int is_redirection);
 void	free_two_dimensional(char **two_dimensional);
+
+//builtin
+int		cd(char *path);
+int		pwd(int *fd);
+
+int		error(void);
+void	merror(void *addr);
+
+void	save_env_values(t_info *info, char **envp);
+
+void	sig_handler(int signo);
+
+void	builtin(t_info *info, int *fd);
 
 #endif

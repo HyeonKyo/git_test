@@ -76,6 +76,7 @@ void	execute_output_command(t_info *info, char **command, int fd)
 		path_of_commnad
 			= get_path_of_command(info->env_path, command[0]);
 		execve(path_of_commnad, command, info->env_list);
+		// builtin(info);//부모 -> 표준출력
 		free(path_of_commnad);
 		print_error(command[0]);
 	}

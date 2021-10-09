@@ -26,20 +26,20 @@ static void	parent_process_of_pipeline(t_info *info, int depth)
 }
 
 /*execute_command*() 함수의 depth 매개변수는 파이프라인 개수를 의미*/
-void	execute_shell_command(t_info *info, int depth)
+int	execute_shell_command(t_info *info, int depth)
 {
 	int		pid;
 	int		exit_status_of_child;
 
 	if (depth < 0 || (depth == 0 && info->n_pipeline))
-		return ;
-	info->pipex.old_pipe[0] = info->pipex.new_pipe[0];
-	info->pipex.old_pipe[1] = info->pipex.new_pipe[1];
+		return (NORMAL);
+	info->pipex.old_pipe[READ] = info->pipex.new_pipe[READ];
+	info->pipex.old_pipe[WRITE] = info->pipex.new_pipe[WRITE];
 	if (pipe(info->pipex.new_pipe) < 0)
-		print_error("pipe error");
+		return (error());
 	pid = fork();
 	if (pid == -1)
-		print_error("fork error");
+		return (error());
 	else if (pid > 0)
 	{
 		waitpid(pid, &exit_status_of_child, WNOHANG);
@@ -63,4 +63,5 @@ void	execute_shell_command(t_info *info, int depth)
 		if (depth <= 1)
 			child_process_of_pipeline(info, depth);
 	}
+	return (NORMAL);
 }
