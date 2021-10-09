@@ -31,6 +31,8 @@
 # define ERROR 1
 # define NORMAL 0
 
+# define READ 0
+# define WRITE 1
 
 /*
 ** =============================================================================
@@ -38,11 +40,25 @@
 ** =============================================================================
 */
 
+typedef struct s_pipex
+{
+	int		new_pipe[2];
+	int		old_pipe[2];
+	char	*limiter;
+	int		is_here_doc;
+}	t_pipex;
+
 typedef struct s_minishell
 {
 	char	**environment_path;
-	char	*limiter;
-	int		is_here_doc;
+	char	**environment;
+	char	**command;
+	int		command_sequence;
+	int		command_total_number;
+	int		number_of_pipeline;
+	char	*infile_name;
+	char	*outfile_name;
+	t_pipex pipex;
 }			t_minishell;
 
 /*
@@ -51,5 +67,11 @@ typedef struct s_minishell
 ** =============================================================================
 */
 
+void	execute_shell_command(t_minishell *minishell, int depth);
+void	input_command_of_pipeline(t_minishell *minishell, int is_redirection);
+void	output_command_of_pipeline(t_minishell *minishell, int is_redirection);
+void	execute_input_command(t_minishell *minishell, char **command, int fd);
+void	execute_output_command(t_minishell *minishell, char **command, int fd);
+void	print_error(char *output_string);
 
 #endif

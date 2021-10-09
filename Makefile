@@ -1,6 +1,9 @@
 NAME = minishell
 
-SRCS = ./srcs/main.c
+SRCS = 	./srcs/main.c\
+		./srcs/execute_shell_command.c ./srcs/command_of_pipeline.c\
+		./srcs/execute_execve_function.c ./srcs/get_fd_will_be_stdio.c\
+		./srcs/print_error.c
 OBJS = $(SRCS:.c=.o)
 
 INC	= ./includes/
