@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+#include "minishell.h"
 
 int	get_fd_will_be_stdin(t_minishell *minishell, int is_redirection)
 {
@@ -8,7 +8,7 @@ int	get_fd_will_be_stdin(t_minishell *minishell, int is_redirection)
 	if (minishell->pipex.is_here_doc)
 		// fd = read_string_from_stdin(minishell);
 		fd = 0;
-	else if (minishell->number_of_pipeline) 
+	else if (minishell->number_of_pipeline)
 		fd = minishell->pipex.new_pipe[READ];
 	else if (is_redirection)
 	{
