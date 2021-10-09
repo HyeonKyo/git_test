@@ -8,8 +8,8 @@
 */
 
 # include <stdio.h>
-# include <readline/readline.h>
 # include <readline/history.h>
+# include <readline/readline.h>
 # include <unistd.h>
 # include <stdlib.h>
 # include <signal.h>
@@ -17,6 +17,7 @@
 # include <sys/wait.h>
 # include <fcntl.h>
 # include <errno.h>
+# include "readline.h"
 # include "libft.h"
 
 /*
@@ -73,5 +74,8 @@ void	output_command_of_pipeline(t_minishell *minishell, int is_redirection);
 void	execute_input_command(t_minishell *minishell, char **command, int fd);
 void	execute_output_command(t_minishell *minishell, char **command, int fd);
 void	print_error(char *output_string);
+int		get_fd_will_be_stdin(t_minishell *minishell, int is_redirection);
+int		get_fd_will_be_stdout(t_minishell *minishell, int is_redirection);
+void	free_two_dimensional(char **two_dimensional);
 
 #endif

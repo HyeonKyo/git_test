@@ -105,7 +105,7 @@ void	sig_handler(int signum)
 	}
 }
 
-int	main(void)
+int	main(int arc, char *arvg[], char *envp[])
 {
 	char		*line;
 	t_minishell	minishell;

@@ -3,13 +3,13 @@ NAME = minishell
 SRCS = 	./srcs/main.c\
 		./srcs/execute_shell_command.c ./srcs/command_of_pipeline.c\
 		./srcs/execute_execve_function.c ./srcs/get_fd_will_be_stdio.c\
-		./srcs/print_error.c
+		./srcs/print_error.c ./srcs/free_two_dimensional.c
 OBJS = $(SRCS:.c=.o)
 
 INC	= ./includes/
 LIBFT = ./Libft/
 CC = gcc
-CFLAGS = -g3 -fsanitize=address -lreadline -I/usr/local/opt/readline/include -L/usr/local/opt/readline/lib
+CFLAGS = -g3 -fsanitize=address -lreadline -I~/.brew/opt/readline/include -L~/.brew/opt/readline/lib
 #CFLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address -lncurses
 
 all : $(NAME)
