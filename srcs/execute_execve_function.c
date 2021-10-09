@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+#include "minishell.h"
 
 static char	*get_path_of_command(char **environment_path, char *command)
 {
@@ -10,7 +10,7 @@ static char	*get_path_of_command(char **environment_path, char *command)
 	end = sizeof(environment_path);
 	path_of_commnad = NULL;
 	while (idx < end)
-	{	
+	{
 		if (access(command, F_OK) == 0)
 			return (command);
 		path_of_commnad = ft_strjoin(environment_path[idx], command);
@@ -68,7 +68,7 @@ void	execute_output_command(t_minishell *minishell, char **command, int fd)
 	}
 	else if (pid == 0)
 	{
-		if (minishell->number_of_pipeline) 
+		if (minishell->number_of_pipeline)
 		{
 			dup2(fd, 1);
 			close(fd);

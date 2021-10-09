@@ -9,14 +9,14 @@ OBJS = $(SRCS:.c=.o)
 INC	= ./includes/
 LIBFT = ./Libft/
 CC = gcc
-CFLAGS = -g3 -fsanitize=address -lreadline -I~/.brew/opt/readline/include -L~/.brew/opt/readline/lib
+CFLAGS = -g3 -fsanitize=address -lreadline -L./readline/lib
 #CFLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address -lncurses
 
 all : $(NAME)
 
 $(NAME) : $(SRCS)
 	make all -C $(LIBFT)
-	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) ./Libft/libft.a -I $(INC)
+	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) ./Libft/libft.a -I$(INC)
 
 fclean : clean
 	make clean -C $(LIBFT)

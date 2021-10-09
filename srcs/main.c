@@ -1,20 +1,5 @@
 # include "minishell.h"
 
-void	free_two_dimensional(char **two_dimensional)
-{
-	int	idx;
-
-	idx = 0;
-	while (two_dimensional[idx])
-	{
-		if (!(two_dimensional[idx]))
-			free(two_dimensional[idx]);
-		idx++;
-	}
-	if (!(two_dimensional))
-		free(two_dimensional);
-}
-
 static char	*get_path_of_command(char **environment_path, char *command)
 {
 	int		idx;
@@ -91,7 +76,6 @@ void	get_line(t_minishell *minishell)
 		add_history(line);//히스토리 저장은 어디에 되는지?
 	minishell->number_of_pipeline = 0;
 	execute_shell_command(minishell, minishell->number_of_pipeline);
-	free(minishell->command);
 }
 
 void	sig_handler(int signum)
@@ -110,7 +94,7 @@ int	main(int arc, char *arvg[], char *envp[])
 	char		*line;
 	t_minishell	minishell;
 
-	minishell.environment = NULL;
+	minishell.environment = envp;//save_env_values로 대체
 	set_environment_path(&minishell);
 	signal(SIGINT, sig_handler);
 	while (1)

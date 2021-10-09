@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+#include "minishell.h"
 
 void	input_command_of_pipeline(t_minishell *minishell, int is_redirection)
 {

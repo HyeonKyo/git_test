@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+#include "minishell.h"
 
 static void	child_process_of_pipeline(t_minishell *minishell, int depth)
 {
