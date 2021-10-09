@@ -80,7 +80,14 @@ void	free_two_dimensional(char **two_dimensional);
 //builtin
 int		cd(char *path);
 int		pwd(int *fd);
+
+int		check_listin(char *env_value, t_info *info);
+int		get_env_list_size(char **env_list);
 void	export(char **cmd, t_info *info);
+
+void	unset(char **cmd, t_info *info);
+
+void	env(t_info *info, int *fd);
 
 int		error(void);
 void	merror(void *addr);

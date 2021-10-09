@@ -1,21 +1,31 @@
 #include "minishell.h"
 
-int	check_listin(char **env, t_info *info)
+int	check_listin(char *env_value, t_info *info)
 {
 	int	i;
 	int	len_value;
 
-	len_value = (int)ft_strlen(env[0]);
+	len_value = (int)ft_strlen(env_value);
 	while (info->env_list[i] != NULL)
 	{
-		if (!ft_strncmp(env[0], info->env_list[i], len_value))
+		if (!ft_strncmp(env_value, info->env_list[i], len_value))
 		{
 			if (info->env_list[i][len_value] == '=')
 				return (i);
 		}
 		i++;
 	}
-	return (FALSE);
+	return (-1);
+}
+
+int	get_env_list_size(char **env_list)
+{
+	int	list_len;
+
+	list_len = 0;
+	while (env_list[list_len++])
+		;
+	return (list_len);
 }
 
 int	make_new_list(t_info *info)
@@ -26,9 +36,7 @@ int	make_new_list(t_info *info)
 	char	**new;
 
 	env_list = info->env_list;
-	list_len = 0;
-	while (env_list[list_len++])
-		;
+	list_len = get_env_list_size(env_list);
 	new = (char **)malloc(sizeof(char *) * (list_len + 1));
 	merror(new);
 	i = -1;
@@ -69,7 +77,7 @@ void	export(char **cmd, t_info *info)
 	env = ft_split(cmd[1], '=');
 	merror(env);
 	idx = check_listin(env, info);
-	if (idx)
+	if (idx >= 0)
 		add_env_value(idx, env, info);
 	else
 		add_new_env(cmd, info);

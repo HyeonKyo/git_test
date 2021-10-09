@@ -13,6 +13,12 @@ int	builtin(t_info *info, int *fd)
 		pwd(fd);
 	else if (!ft_strncmp(cmd[0], "export", cmd_len))
 		export(cmd, info);
+	else if (!ft_strncmp(cmd[0], "unset", cmd_len))
+		unset(cmd, info);
+	else if (!ft_strncmp(cmd[0], "env", cmd_len))
+		env(info, fd);
+	else if (!ft_strncmp(cmd[0], "exit", cmd_len))
+		exit(0);
 	else
 	{
 		free_env_list(cmd);
