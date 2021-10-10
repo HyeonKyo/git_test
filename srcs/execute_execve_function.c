@@ -23,63 +23,57 @@ static char	*get_path_of_command(char **env_path, char *cmd)
 	return (path_of_cmd);
 }
 
-void	execute_input_command(t_info *info, char **cmd, int fd)
+void	execute_input_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout)
 {
 	int		pid;
 	int		exit_status_of_child;
 	char	*path_of_cmd;
+	int		fd[2];
 
 	pid = fork();
+	fd[0] = fd_stdin;
+	fd[1] = fd_stdout;
 	if (pid == -1)
-		print_error("fork error");
+		error();
 	else if (pid > 0)
 	{
 		if (waitpid(pid, &exit_status_of_child, 0) == -1)
-			print_error("waitpid error");
+			error();
 	}
 	else if (pid == 0)
 	{
-		if (info->n_pipeline)
-		{
-			dup2(fd, 0);
-			close(fd);
-		}
 		path_of_cmd
 			= get_path_of_command(info->env_path, cmd[0]);
+		switch_stdio(info, fd_stdin, fd_stdout);
 		execve(path_of_cmd, cmd, info->env_list);
-		if (path_of_cmd)
-			free(path_of_cmd);
-		print_error(cmd[0]);
+		// builtin(info, fd);
 	}
 }
 
-void	execute_output_command(t_info *info, char **command, int fd)
+void	execute_output_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout)
 {
 	int		pid;
 	int		exit_status_of_child;
-	char	*path_of_commnad;
+	char	*path_of_cmd;
+	int		fd[2];
 
 	pid = fork();
+	fd[0] = fd_stdin;
+	fd[1] = fd_stdout;
 	exit_status_of_child = 0;
 	if (pid == -1)
-		print_error("fork error");
+		error();
 	else if (pid > 0)
 	{
 		if (waitpid(pid, &exit_status_of_child, 0) == -1)
-			print_error("waitpid error");
+			error();
 	}
 	else if (pid == 0)
 	{
-		if (info->n_pipeline)
-		{
-			dup2(fd, 1);
-			close(fd);
-		}
-		path_of_commnad
-			= get_path_of_command(info->env_path, command[0]);
-		execve(path_of_commnad, command, info->env_list);
-		// builtin(info);//부모 -> 표준출력
-		free(path_of_commnad);
-		print_error(command[0]);
+		path_of_cmd
+			= get_path_of_command(info->env_path, cmd[0]);
+		switch_stdio(info, fd_stdin, fd_stdout);
+		execve(path_of_cmd, cmd, info->env_list);
+		// builtin(info, fd);
 	}
 }

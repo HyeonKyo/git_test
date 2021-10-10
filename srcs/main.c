@@ -73,14 +73,17 @@ void	get_line(t_info *info)
 		ft_putstr_fd("exit\n", STDOUT_FILENO);
 		exit(0);
 	}
-	info->cmd = (char **)malloc(sizeof(char * ) * 2);
+	info->cmd = (char **)malloc(sizeof(char * ) * 4);
 	merror(info->cmd);
-	*info->cmd = line;
-	*(info->cmd + 1) = NULL;
+	info->cmd[0] = line;
+	info->cmd[1] = ft_strdup("wc -l"); //파이프라인 시험해볼려고 임시로 명령어 넣어놓음
+	info->cmd[2] = ft_strdup("cat");//파이프라인 시험해볼려고 임시로 명령어 넣어놓음
+	info->cmd[3] = NULL;
 	// info->command = ft_split(line, ' ');//파싱 함수로 대체
 	if (line)
 		add_history(line);//히스토리 저장은 어디에 되는지?
-	info->n_pipeline = 0;
+	info->n_pipeline = 1;
+	info->cmd_total_number = 2;
 	execute_shell_command(info, info->n_pipeline);
 }
 
@@ -89,6 +92,7 @@ int	main(int arc, char *arvg[], char *envp[])
 	char	*line;
 	t_info	info;
 
+	info.pipex.is_here_doc = 0;
 	save_env_values(&info, envp);
 	set_environment_path(&info);
 	signal(SIGINT, sig_handler);
