@@ -6,7 +6,6 @@ SRCS = 	./srcs/main.c\
 		./srcs/get_fd_will_be_stdio.c\
 		./srcs/switch_stdio.c\
 		./srcs/free_two_dimensional.c\
-		./srcs/print_error.c		\
 		./srcs/cd.c			\
 		./srcs/pwd.c			\
 		./srcs/signal.c			\
