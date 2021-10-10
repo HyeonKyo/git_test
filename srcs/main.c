@@ -53,7 +53,6 @@ void	get_line(t_info *info)
 {
 	char	*line;
 	char	**command;
-	char	*current_path;
 	int		pid;
 	char	*str;
 
@@ -64,12 +63,16 @@ void	get_line(t_info *info)
 		line = NULL;
 	}
 	//함수로 따로 따기
-	current_path = getcwd(NULL, 0);//상대경로(마지막 슬래쉬)파싱 함수 만들기
-	str = ft_strjoin("info ", current_path);
-	str = ft_strjoin(str, ">");
+	// str = make_cursor_string();//주소 넣을거면 이걸로
+	str = "Minishell >";
 	line = readline(str);
 	if (line == NULL)//EOF(ctrl + d)만나면 NULL
+	{
+		ft_putstr_fd("\x1b[1A", STDOUT_FILENO);
+		ft_putstr_fd("\033[12C", STDOUT_FILENO);
+		ft_putstr_fd("exit\n", STDOUT_FILENO);
 		exit(0);
+	}
 	info->cmd = (char **)malloc(sizeof(char * ) * 2);
 	merror(info->cmd);
 	*info->cmd = line;
@@ -90,7 +93,7 @@ int	main(int arc, char *arvg[], char *envp[])
 	set_environment_path(&info);
 	signal(SIGINT, sig_handler);
 	signal(SIGQUIT, sig_handler);
-	while (1)
+	while (TRUE)
 	{
 		get_line(&info);
 	}

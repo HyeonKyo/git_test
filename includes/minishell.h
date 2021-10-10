@@ -77,6 +77,8 @@ int		get_fd_will_be_stdout(t_info *info, int is_redirection);
 void	print_error(char *output_string);
 void	free_two_dimensional(char **two_dimensional);
 
+char	*make_cursor_string(void);
+
 //builtin
 int		cd(char *path);
 int		pwd(int *fd);
