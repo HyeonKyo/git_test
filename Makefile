@@ -9,13 +9,16 @@ SRCS = 	./srcs/main.c\
 		./srcs/pwd.c			\
 		./srcs/signal.c			\
 		./srcs/error.c			\
+		./srcs/make_cursor_string.c	\
+		./srcs/builtin/free.c	\
 		./srcs/save_env_values.c
 OBJS = $(SRCS:.c=.o)
 
 INC	= ./includes/
 LIBFT = ./Libft/
 CC = gcc
-CFLAGS = -g3 -fsanitize=address -lreadline -L./readline/lib
+CFLAGS = -g -fsanitize=address -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include
+# CFLAGS = -g3 -fsanitize=address -lreadline -L./readline/lib
 #CFLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address -lncurses
 
 all : $(NAME)
