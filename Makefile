@@ -1,10 +1,11 @@
 NAME = minishell
 
 SRCS = 	./srcs/main.c\
-		./srcs/execute_shell_command.c ./srcs/command_of_pipeline.c\
-		./srcs/execute_execve_function.c ./srcs/get_fd_will_be_stdio.c\
-		./srcs/free_two_dimensional.c				\
-		./srcs/print_error.c		\
+		./srcs/execute_shell_command.c\
+		./srcs/execute_execve_function.c\
+		./srcs/get_fd_will_be_stdio.c\
+		./srcs/switch_stdio.c\
+		./srcs/free_two_dimensional.c\
 		./srcs/cd.c			\
 		./srcs/pwd.c			\
 		./srcs/signal.c			\

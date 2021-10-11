@@ -1,28 +1,45 @@
-#include "minishell.h"
+#include "../includes/minishell.h"
 
 static void	child_process_of_pipeline(t_info *info, int depth)
 {
 	int		is_redirection;
+	char	**command;
+	int		fd_stdin;
+	int		fd_stdout;
 
-	is_redirection = 0; /*리다이렉션 나중에 구현...*/
-	// if (depth == 0 && !(info->pipex.is_here_doc))
-	// 	is_redirection = 1;
+	is_redirection = 0; //리다이렉션 나중에 구현...
 	info->cmd_sequence = depth - 1;
 	if (!info->n_pipeline)
 		info->cmd_sequence = 0; //파이프라인이 없으면 실행할 명령어가 한 개니까 0으로 초기화
-	input_command_of_pipeline(info, is_redirection);
-	exit(EXIT_SUCCESS);
+	fd_stdin = get_fd_will_be_stdin(info, is_redirection);
+	fd_stdout = get_fd_will_be_stdout(info, is_redirection);
+	command = ft_split(info->cmd[info->cmd_sequence], ' ');
+	execute_input_command(info, command, fd_stdin, fd_stdout);
+	if (fd_stdin != STDIN_FILENO)
+		close(fd_stdin);
+	if (fd_stdout != STDOUT_FILENO)
+		close(fd_stdout);
+	free_two_dimensional(command);
 }
 
 static void	parent_process_of_pipeline(t_info *info, int depth)
 {
 	int		is_redirection;
+	char	**command;
+	int		fd_stdin;
+	int		fd_stdout;
 
-	is_redirection = 0; /*리다이렉션 나중에 구현...*/
-	// if (depth == (info->command_total_number - 2))
-	// 	is_redirection = 1;
+	is_redirection = 0; //리다이렉션 나중에 구현...
 	info->cmd_sequence = depth;
-	output_command_of_pipeline(info, is_redirection);
+	fd_stdin = get_fd_will_be_stdin(info, is_redirection);
+	fd_stdout = get_fd_will_be_stdout(info, is_redirection);
+	command = ft_split(info->cmd[info->cmd_sequence], ' ');
+	execute_output_command(info, command, fd_stdin, fd_stdout);
+	if (fd_stdin != STDIN_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
+		close(fd_stdin);
+	if (fd_stdout != STDOUT_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
+		close(fd_stdout);
+	free_two_dimensional(command);
 }
 
 /*execute_command*() 함수의 depth 매개변수는 파이프라인 개수를 의미*/
@@ -62,6 +79,7 @@ int	execute_shell_command(t_info *info, int depth)
 		*/
 		if (depth <= 1)
 			child_process_of_pipeline(info, depth);
+		exit(EXIT_SUCCESS);
 	}
 	return (NORMAL);
 }

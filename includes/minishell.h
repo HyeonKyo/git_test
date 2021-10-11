@@ -68,14 +68,13 @@ typedef struct s_info
 */
 
 int		execute_shell_command(t_info *info, int depth);
-void	input_command_of_pipeline(t_info *info, int is_redirection);
-void	output_command_of_pipeline(t_info *info, int is_redirection);
-void	execute_input_command(t_info *info, char **command, int fd);
-void	execute_output_command(t_info *info, char **command, int fd);
+void	execute_input_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout);
+void	execute_output_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout);
 int		get_fd_will_be_stdin(t_info *info, int is_redirection);
 int		get_fd_will_be_stdout(t_info *info, int is_redirection);
 void	print_error(char *output_string);
 void	free_two_dimensional(char **two_dimensional);
+void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
 
 char	*make_cursor_string(void);
 
