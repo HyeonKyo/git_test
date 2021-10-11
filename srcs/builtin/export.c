@@ -76,7 +76,7 @@ void	export(char **cmd, t_info *info)
 
 	env = ft_split(cmd[1], '=');
 	merror(env);
-	idx = check_listin(env, info);
+	idx = check_listin(env[0], info);
 	if (idx >= 0)
 		add_env_value(idx, env, info);
 	else

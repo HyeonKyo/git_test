@@ -23,44 +23,40 @@ static char	*get_path_of_command(char **env_path, char *cmd)
 	return (path_of_cmd);
 }
 
-void	execute_input_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout)
+int	is_builtin_command(t_info *info)
 {
-	int		pid;
-	int		exit_status_of_child;
-	char	*path_of_cmd;
-	int		fd[2];
+	char	**cmd;
+	int		cmd_len;
 
-	pid = fork();
-	fd[0] = fd_stdin;
-	fd[1] = fd_stdout;
-	if (pid == -1)
-		error();
-	else if (pid > 0)
-	{
-		if (waitpid(pid, &exit_status_of_child, 0) == -1)
-			error();
-	}
-	else if (pid == 0)
-	{
-		path_of_cmd
-			= get_path_of_command(info->env_path, cmd[0]);
-		switch_stdio(info, fd_stdin, fd_stdout);
-		// execve(path_of_cmd, cmd, info->env_list);
-		builtin(info, fd);
-	}
+	cmd = ft_split(info->cmd[info->cmd_sequence], ' ');
+	cmd_len = ft_strlen(cmd[0]);
+	if (!ft_strncmp(cmd[0], "cd", cmd_len))
+		return (TRUE);
+	else if (!ft_strncmp(cmd[0], "pwd", cmd_len))
+		return (TRUE);
+	else if (!ft_strncmp(cmd[0], "export", cmd_len))
+		return (TRUE);
+	else if (!ft_strncmp(cmd[0], "unset", cmd_len))
+		return (TRUE);
+	else if (!ft_strncmp(cmd[0], "env", cmd_len))
+		return (TRUE);
+	else if (!ft_strncmp(cmd[0], "exit", cmd_len))
+		return (TRUE);
+	return (FALSE);
 }
 
-void	execute_output_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout)
+void	execute_command(t_info *info, char **cmd, int fd[])
 {
 	int		pid;
 	int		exit_status_of_child;
 	char	*path_of_cmd;
-	int		fd[2];
 
+	if (is_builtin_command(info) && !(info->n_pipeline))
+	{
+		builtin(info, fd);
+		return ;
+	}
 	pid = fork();
-	fd[0] = fd_stdin;
-	fd[1] = fd_stdout;
-	exit_status_of_child = 0;
 	if (pid == -1)
 		error();
 	else if (pid > 0)
@@ -72,8 +68,8 @@ void	execute_output_command(t_info *info, char **cmd, int fd_stdin, int fd_stdou
 	{
 		path_of_cmd
 			= get_path_of_command(info->env_path, cmd[0]);
-		switch_stdio(info, fd_stdin, fd_stdout);
-		//execve(path_of_cmd, cmd, info->env_list);
+		switch_stdio(info, fd[READ], fd[WRITE]);
+		execve(path_of_cmd, cmd, info->env_list);
 		builtin(info, fd);
 	}
 }

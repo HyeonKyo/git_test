@@ -4,21 +4,18 @@ static void	child_process_of_pipeline(t_info *info, int depth)
 {
 	int		is_redirection;
 	char	**command;
-	int		fd_stdin;
-	int		fd_stdout;
+	int		fd[2];
 
 	is_redirection = 0; //리다이렉션 나중에 구현...
 	info->cmd_sequence = depth - 1;
-	if (!info->n_pipeline)
-		info->cmd_sequence = 0; //파이프라인이 없으면 실행할 명령어가 한 개니까 0으로 초기화
-	fd_stdin = get_fd_will_be_stdin(info, is_redirection);
-	fd_stdout = get_fd_will_be_stdout(info, is_redirection);
+	fd[READ] = get_fd_will_be_stdin(info, is_redirection);
+	fd[WRITE] = get_fd_will_be_stdout(info, is_redirection);
 	command = ft_split(info->cmd[info->cmd_sequence], ' ');
-	execute_input_command(info, command, fd_stdin, fd_stdout);
-	if (fd_stdin != STDIN_FILENO)
-		close(fd_stdin);
-	if (fd_stdout != STDOUT_FILENO)
-		close(fd_stdout);
+	execute_command(info, command, fd);
+	if (fd[READ] != STDIN_FILENO)
+		close(fd[READ]);
+	if (fd[WRITE] != STDOUT_FILENO)
+		close(fd[WRITE]);
 	free_two_dimensional(command);
 }
 
@@ -26,19 +23,18 @@ static void	parent_process_of_pipeline(t_info *info, int depth)
 {
 	int		is_redirection;
 	char	**command;
-	int		fd_stdin;
-	int		fd_stdout;
+	int		fd[2];
 
 	is_redirection = 0; //리다이렉션 나중에 구현...
 	info->cmd_sequence = depth;
-	fd_stdin = get_fd_will_be_stdin(info, is_redirection);
-	fd_stdout = get_fd_will_be_stdout(info, is_redirection);
+	fd[READ] = get_fd_will_be_stdin(info, is_redirection);
+	fd[WRITE] = get_fd_will_be_stdout(info, is_redirection);
 	command = ft_split(info->cmd[info->cmd_sequence], ' ');
-	execute_output_command(info, command, fd_stdin, fd_stdout);
-	if (fd_stdin != STDIN_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
-		close(fd_stdin);
-	if (fd_stdout != STDOUT_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
-		close(fd_stdout);
+	execute_command(info, command, fd);
+	if (fd[READ] != STDIN_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
+		close(fd[READ]);
+	if (fd[WRITE] != STDOUT_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
+		close(fd[WRITE]);
 	free_two_dimensional(command);
 }
 
@@ -61,8 +57,7 @@ int	execute_shell_command(t_info *info, int depth)
 	{
 		waitpid(pid, &exit_status_of_child, 0);
 		/* number_of_pipeline이 0보다 클 경우에만 부모 프로세스에서 명령어 실행*/
-		if (info->n_pipeline)
-			parent_process_of_pipeline(info, depth);
+		parent_process_of_pipeline(info, depth);
 	}
 	else if (pid == 0)
 	{
@@ -77,7 +72,7 @@ int	execute_shell_command(t_info *info, int depth)
 		 그래서 if (depth <= 1) 즉, 제일 먼저 실행되는 명령어만
 		 child_process_of_pipeline() 이 함수를 실행하는 것이다.
 		*/
-		if (depth <= 1)
+		if (depth <= 1 && info->n_pipeline)
 			child_process_of_pipeline(info, depth);
 		exit(EXIT_SUCCESS);
 	}

@@ -73,6 +73,8 @@ void	get_line(t_info *info)
 		ft_putstr_fd("exit\n", STDOUT_FILENO);
 		exit(0);
 	}
+	if (*line == 0)//엔터 눌렀을 때 함수 종료
+		return ;
 	info->cmd = (char **)malloc(sizeof(char * ) * 4);
 	merror(info->cmd);
 	info->cmd[0] = line;
@@ -84,6 +86,9 @@ void	get_line(t_info *info)
 		add_history(line);//히스토리 저장은 어디에 되는지?
 	info->n_pipeline = 0;
 	info->cmd_total_number = 1;
+	// info->cmd_sequence = 0;
+	// int	fd[2] = {0, 1};
+	// builtin(info, fd);
 	execute_shell_command(info, info->n_pipeline);
 }
 
