@@ -3,39 +3,39 @@
 static void	child_process_of_pipeline(t_info *info, int depth)
 {
 	int		is_redirection;
-	char	**command;
+	char	**cmd;
 	int		fd[2];
 
 	is_redirection = 0; //리다이렉션 나중에 구현...
 	info->cmd_sequence = depth - 1;
 	fd[READ] = get_fd_will_be_stdin(info, is_redirection);
 	fd[WRITE] = get_fd_will_be_stdout(info, is_redirection);
-	command = ft_split(info->cmd[info->cmd_sequence], ' ');
-	execute_command(info, command, fd);
+	cmd = ft_split(info->cmd[info->cmd_sequence], ' ');
+	execute_command(info, cmd, fd);
 	if (fd[READ] != STDIN_FILENO)
 		close(fd[READ]);
 	if (fd[WRITE] != STDOUT_FILENO)
 		close(fd[WRITE]);
-	free_two_dimensional(command);
+	free_two_dimensional(cmd);
 }
 
 static void	parent_process_of_pipeline(t_info *info, int depth)
 {
 	int		is_redirection;
-	char	**command;
+	char	**cmd;
 	int		fd[2];
 
 	is_redirection = 0; //리다이렉션 나중에 구현...
 	info->cmd_sequence = depth;
 	fd[READ] = get_fd_will_be_stdin(info, is_redirection);
 	fd[WRITE] = get_fd_will_be_stdout(info, is_redirection);
-	command = ft_split(info->cmd[info->cmd_sequence], ' ');
-	execute_command(info, command, fd);
+	cmd = ft_split(info->cmd[info->cmd_sequence], ' ');
+	execute_command(info, cmd, fd);
 	if (fd[READ] != STDIN_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
 		close(fd[READ]);
 	if (fd[WRITE] != STDOUT_FILENO) //파일이나 파이프에서 받아온 fd 닫아주기
 		close(fd[WRITE]);
-	free_two_dimensional(command);
+	free_two_dimensional(cmd);
 }
 
 /*execute_command*() 함수의 depth 매개변수는 파이프라인 개수를 의미*/
