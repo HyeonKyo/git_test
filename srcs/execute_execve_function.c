@@ -45,8 +45,8 @@ void	execute_input_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout
 		path_of_cmd
 			= get_path_of_command(info->env_path, cmd[0]);
 		switch_stdio(info, fd_stdin, fd_stdout);
-		execve(path_of_cmd, cmd, info->env_list);
-		// builtin(info, fd);
+		// execve(path_of_cmd, cmd, info->env_list);
+		builtin(info, fd);
 	}
 }
 
@@ -73,7 +73,7 @@ void	execute_output_command(t_info *info, char **cmd, int fd_stdin, int fd_stdou
 		path_of_cmd
 			= get_path_of_command(info->env_path, cmd[0]);
 		switch_stdio(info, fd_stdin, fd_stdout);
-		execve(path_of_cmd, cmd, info->env_list);
-		// builtin(info, fd);
+		//execve(path_of_cmd, cmd, info->env_list);
+		builtin(info, fd);
 	}
 }

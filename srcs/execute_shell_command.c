@@ -59,7 +59,7 @@ int	execute_shell_command(t_info *info, int depth)
 		return (error());
 	else if (pid > 0)
 	{
-		waitpid(pid, &exit_status_of_child, WNOHANG);
+		waitpid(pid, &exit_status_of_child, 0);
 		/* number_of_pipeline이 0보다 클 경우에만 부모 프로세스에서 명령어 실행*/
 		if (info->n_pipeline)
 			parent_process_of_pipeline(info, depth);
