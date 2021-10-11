@@ -33,7 +33,7 @@ $(NAME) : $(SRCS)
 	$(CC) $(CFLAGS) -o $(NAME) $(SRCS) ./Libft/libft.a -I$(INC)
 
 fclean : clean
-	make clean -C $(LIBFT)
+	make fclean -C $(LIBFT)
 	rm -rf $(NAME)
 
 clean :
