@@ -10,7 +10,11 @@ SRCS = 	./srcs/main.c\
 		./srcs/pwd.c			\
 		./srcs/signal.c			\
 		./srcs/error.c			\
-		./srcs/make_cursor_string.c	\
+		./srcs/make_cursor_string.c\
+		./srcs/builtin.c\
+		./srcs/builtin/export.c	\
+		./srcs/builtin/unset.c\
+		./srcs/builtin/env.c\
 		./srcs/builtin/free.c	\
 		./srcs/save_env_values.c
 OBJS = $(SRCS:.c=.o)
@@ -18,7 +22,7 @@ OBJS = $(SRCS:.c=.o)
 INC	= ./includes/
 LIBFT = ./Libft/
 CC = gcc
-CFLAGS = -g -fsanitize=address -lreadline -L/usr/local/opt/readline/lib -I/usr/local/opt/readline/include
+CFLAGS = -g -fsanitize=address -lreadline -L$(HOME)/.brew/opt/readline/lib -I$(HOME)/.brew/opt/readline/include
 # CFLAGS = -g3 -fsanitize=address -lreadline -L./readline/lib
 #CFLAGS = -Wall -Werror -Wextra -g3 -fsanitize=address -lncurses
 
