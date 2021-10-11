@@ -68,8 +68,9 @@ typedef struct s_info
 */
 
 int		execute_shell_command(t_info *info, int depth);
-void	execute_input_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout);
-void	execute_output_command(t_info *info, char **cmd, int fd_stdin, int fd_stdout);
+void	execute_command(t_info *info, char **cmd, int fd[]);
+// void	execute_input_command(t_info *info, char **cmd, int fd[]);
+// void	execute_output_command(t_info *info, char **cmd, int fd[]);
 int		get_fd_will_be_stdin(t_info *info, int is_redirection);
 int		get_fd_will_be_stdout(t_info *info, int is_redirection);
 void	print_error(char *output_string);
