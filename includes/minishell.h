@@ -12,6 +12,7 @@
 # include "readline/readline.h"
 # include <unistd.h>
 # include <stdlib.h>
+# include <sys/stat.h>
 # include <signal.h>
 # include <string.h>
 # include <sys/wait.h>
