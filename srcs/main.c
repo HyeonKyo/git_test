@@ -87,9 +87,8 @@ void	get_line(t_info *info)
 	// info->command = ft_split(line, ' ');//파싱 함수로 대체
 	if (line)
 		add_history(line);//히스토리 저장은 어디에 되는지?
-	info->n_pipeline = 0;
-	info->cmd_total_number = 1;
-	//parse_line(line, info);
+	info->n_pipeline = 1;
+	info->cmd_total_number = 2;
 	// info->cmd_sequence = 0;
 	// int	fd[2] = {0, 1};
 	// builtin(info, fd);

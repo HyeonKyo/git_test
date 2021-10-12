@@ -12,6 +12,7 @@
 # include "readline/readline.h"
 # include <unistd.h>
 # include <stdlib.h>
+# include <sys/stat.h>
 # include <signal.h>
 # include <string.h>
 # include <sys/wait.h>
@@ -44,6 +45,8 @@ typedef enum e_type
 {
 	NORM = 0,
 	SQUOTE, DQUOTE,
+	SPCE, SPEC, DOLR, PIPE, END,
+	RRDI, LRDI, DRRDI, DLRDI
 
 }			t_type;
 
@@ -97,7 +100,8 @@ char	*make_cursor_string(void);
 int		cd(char *path);
 int		pwd(int *fd);
 
-int		check_listin(char *env_value, t_info *info);
+int		check_listin(char *env_key, t_info *info);
+char	*get_env_value(char *env_key, t_info *info);
 int		get_env_list_size(char **env_list);
 void	export(char **cmd, t_info *info);
 
