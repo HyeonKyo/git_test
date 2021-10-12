@@ -55,22 +55,28 @@ void	execute_command(t_info *info, char **cmd, int fd[])
 	if (is_builtin_command(info) && !(info->n_pipeline))
 	{
 		builtin(info, fd);
-		return ;
 	}
-	pid = fork();
-	if (pid == -1)
-		error();
-	else if (pid > 0)
+	// else if (is_redirection_command(info))
+	// { 빌트인이나 리다이렉션이 아니면 자식 프로세스 만들어서 작업
+	// 	execute_redirection(info);
+	// }
+	else
 	{
-		if (waitpid(pid, &exit_status_of_child, 0) == -1)
+		pid = fork();
+		if (pid == -1)
 			error();
-	}
-	else if (pid == 0)
-	{
-		path_of_cmd
-			= get_path_of_command(info->env_path, cmd[0]);
-		switch_stdio(info, fd[READ], fd[WRITE]);
-		execve(path_of_cmd, cmd, info->env_list);
-		builtin(info, fd);
+		else if (pid > 0)
+		{
+			if (waitpid(pid, &exit_status_of_child, 0) == -1)
+				error();
+		}
+		else if (pid == 0)
+		{
+			path_of_cmd
+				= get_path_of_command(info->env_path, cmd[0]);
+			switch_stdio(info, fd[READ], fd[WRITE]);
+			execve(path_of_cmd, cmd, info->env_list);
+			builtin(info, fd);//위에거랑 순서 바꾸고 빌트인 실행 했는지 아닌지 확인 후 exe실행하기
+		}
 	}
 }

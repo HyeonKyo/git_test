@@ -1,14 +1,14 @@
 #include "minishell.h"
 
-int	check_listin(char *env_value, t_info *info)
+int	check_listin(char *env_key, t_info *info)
 {
 	int	i;
 	int	len_value;
 
-	len_value = (int)ft_strlen(env_value);
+	len_value = (int)ft_strlen(env_key);
 	while (info->env_list[i] != NULL)
 	{
-		if (!ft_strncmp(env_value, info->env_list[i], len_value))
+		if (!ft_strncmp(env_key, info->env_list[i], len_value))
 		{
 			if (info->env_list[i][len_value] == '=')
 				return (i);
@@ -46,6 +46,22 @@ int	make_new_list(t_info *info)
 	free_env_list(env_list);
 	info->env_list = new;
 	return (list_len);
+}
+
+char	*get_env_value(char *env_key, t_info *info)
+{
+	int		env_idx;
+	char	**env;
+	char	*env_value;
+
+	env_idx = check_listin(env_key, info);
+	if (env_idx < 0)
+		return (NULL);
+	env = ft_split(info->env_list[env_idx], '=');
+	merror(env);
+	env_value = ft_strdup(env[1]);
+	free_env_list(env);
+	return (env_value);
 }
 
 void	add_env_value(int idx, char **env, t_info *info)

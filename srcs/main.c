@@ -74,7 +74,10 @@ void	get_line(t_info *info)
 		exit(0);
 	}
 	if (*line == 0)//엔터 눌렀을 때 함수 종료
+	{
+		free(line);
 		return ;
+	}
 	info->cmd = (char **)malloc(sizeof(char * ) * 4);
 	merror(info->cmd);
 	info->cmd[0] = line;
