@@ -1,27 +1,5 @@
 # include "minishell.h"
 
-static char	*get_path_of_command(char **environment_path, char *command)
-{
-	int		idx;
-	int		end;
-	char	*path_of_commnad;
-
-	idx = 0;
-	end = sizeof(environment_path);
-	path_of_commnad = NULL;
-	while (idx < end)
-	{
-		if (access(command, F_OK) == 0)
-			return (command);
-		path_of_commnad = ft_strjoin(environment_path[idx], command);
-		if (access(path_of_commnad, F_OK) == 0)
-			return (path_of_commnad);
-		free(path_of_commnad);
-		idx++;
-	}
-	return (path_of_commnad);
-}
-
 static void	add_slash_at_end_of_path(t_info *info, char **environment_path)
 {
 	int		idx;
@@ -87,12 +65,12 @@ void	get_line(t_info *info)
 	// info->command = ft_split(line, ' ');//파싱 함수로 대체
 	if (line)
 		add_history(line);//히스토리 저장은 어디에 되는지?
-	info->n_pipeline = 1;
-	info->cmd_total_number = 2;
+	info->pipe_cnt = 1;
+	info->cmd_cnt = 2;
 	// info->cmd_sequence = 0;
 	// int	fd[2] = {0, 1};
 	// builtin(info, fd);
-	execute_shell_command(info, info->n_pipeline);
+	execute_command_main(info, 0);
 }
 
 int	main(int arc, char *arvg[], char *envp[])

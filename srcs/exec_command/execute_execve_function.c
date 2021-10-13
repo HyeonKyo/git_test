@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-static char	*get_path_of_command(char **env_path, char *cmd)
+char	*get_path_of_command(char **env_path, char *cmd)
 {
 	int		idx;
 	int		end;
@@ -12,7 +12,7 @@ static char	*get_path_of_command(char **env_path, char *cmd)
 	path_of_cmd = NULL;
 	while (idx < end)
 	{
-		if (stat(cmd, &file_stat) == 0)//2.access함수 사용 가능한지?
+		if (stat(cmd, &file_stat) == 0)
 			return (cmd);
 		path_of_cmd = ft_strjoin(env_path[idx], cmd);
 		if (stat(path_of_cmd, &file_stat) == 0)
@@ -46,37 +46,24 @@ int	is_builtin_command(t_info *info)
 	return (FALSE);
 }
 
-void	execute_command(t_info *info, char **cmd, int fd[])
+void	execute_execve_function(t_info *info, int depth)
 {
-	int		pid;
-	int		exit_status_of_child;
-	char	*path_of_cmd;
+	char	*path_of_commnad;
+	char	**command;
+	int		fd[2];
 
-	if (is_builtin_command(info) && !(info->n_pipeline))
-	{
-		builtin(info, fd);
-	}
-	// else if (is_redirection_command(info))
+	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
+	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
+	command = ft_split(info->cmd[depth], ' ');
+	path_of_commnad
+		= get_path_of_command(info->env_path, command[0]);
+	switch_stdio(info, fd[READ], fd[WRITE]);
+	// if (is_redirection_command(info))
 	// { 빌트인이나 리다이렉션이 아니면 자식 프로세스 만들어서 작업
 	// 	execute_redirection(info);
 	// }
+	if (is_builtin_command(info))
+		builtin(info, fd);
 	else
-	{
-		pid = fork();
-		if (pid == -1)
-			error();
-		else if (pid > 0)
-		{
-			if (waitpid(pid, &exit_status_of_child, 0) == -1)
-				error();
-		}
-		else if (pid == 0)
-		{
-			path_of_cmd
-				= get_path_of_command(info->env_path, cmd[0]);
-			switch_stdio(info, fd[READ], fd[WRITE]);
-			execve(path_of_cmd, cmd, info->env_list);
-			builtin(info, fd);//위에거랑 순서 바꾸고 빌트인 실행 했는지 아닌지 확인 후 exe실행하기
-		}
-	}
+		execve(path_of_commnad, command, info->env_list);
 }
