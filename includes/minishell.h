@@ -35,6 +35,8 @@
 # define READ 0
 # define WRITE 1
 
+# define ISODD 1
+
 /*
 ** =============================================================================
 ** Enum type Definition
@@ -65,13 +67,21 @@ typedef struct s_pipex
 	int		is_here_doc;
 }	t_pipex;
 
+typedef struct s_cmd
+{
+	char	**cmd;
+	t_type	redi;
+}			t_cmd;
+
 typedef struct s_info
 {
 	char	**env_path;
 	char	**env_list;
 	char	**cmd;
+	t_cmd	*cmds;
 	int		cmd_sequence;
 	int		cmd_total_number;
+	int		n_cmd;
 	int		n_pipeline;
 	char	*infile_name;
 	char	*outfile_name;

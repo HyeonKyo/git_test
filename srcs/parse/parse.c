@@ -45,13 +45,12 @@ t_type	check_type(char c)
 	return (NORM);
 }
 
-t_type	is_quote(char c)
+int	is_separator(t_type type)
 {
-	if (c == '\"')
-		return (DQUOTE);
-	else if (c == '\'')
-		return (SQUOTE);
-	return (NORM);
+	if (type == SPCE || type == PIPE || type == END
+		|| type == RRDI || type == LRDI)
+		return (TRUE);
+	return (FALSE);
 }
 
 /*
@@ -76,22 +75,25 @@ int	check_incorrect_line(char *line)
 	dquote_cnt = 0;
 	while (line[i])
 	{
-		if (check_type(line[i]) == SQUOTE)
+		if (check_type(line[i]) == SQUOTE && dquote_flag == FALSE)
 		{
 			squote_cnt++;
 			squote_flag ^= TRUE;
 		}
-		else if (check_type(line[i]) == DQUOTE)
+		else if (check_type(line[i]) == DQUOTE && squote_flag == FALSE)
 		{
 			dquote_cnt++;
 			dquote_flag ^= TRUE;
 		}
-		if (!squote_flag && !dquote_flag
-			&& (line[i] == ';' || line[i] == '\\'))
+		if (!squote_flag && !dquote_flag &&
+			(line[i] == ';' || line[i] == '\\'))
 			return (TRUE);
+		//리다이렉션 체크 추가
+		//1. <>처럼 다른 게 연속으로 올 떄
+		//2. >>> 처럼 3개 이상이 연속으로 올때
 		i++;
 	}
-	if ((squote_cnt & 1) || (dquote_cnt & 1))
+	if ((squote_cnt & ISODD) || (dquote_cnt & ISODD))
 		return (TRUE);
 	return (FALSE);
 	/*
@@ -118,19 +120,19 @@ int	find_separator(char *line, int idx)
 	while (line[idx])
 	{
 		type = check_type(line[idx]);
-		if (type == SQUOTE)
+		if (type == SQUOTE && dquote_flag == FALSE)
 			squote_flag ^= TRUE;
-		else if (type == DQUOTE)
+		else if (type == DQUOTE && squote_flag == FALSE)
 			dquote_flag ^= TRUE;
 		if (!squote_flag && !dquote_flag && (type == SPCE || type == PIPE
-			|| type == END || is_redirection(line[idx])))
+			|| is_redirection(line[idx])))
 			return (idx);
 		idx++;
 	}
 	return (FALSE);
 }
 
-char	**divide_by_separator(char *line, int start_idx, int sep_idx)
+char	**divide_by_separator(char *line, int sep_idx)
 {
 	char	**str;
 	int		front_len;
@@ -138,14 +140,15 @@ char	**divide_by_separator(char *line, int start_idx, int sep_idx)
 
 	str = (char **)malloc(sizeof(char *) * 2);
 	merror(str);
-	front_len = sep_idx - start_idx + 1;
+	front_len = sep_idx + 1;
 	back_len = ft_strlen(line) - sep_idx + 1;
 	str[0] = (char *)malloc(sizeof(char) * front_len);
 	merror(str[0]);
 	str[1] = (char *)malloc(sizeof(char) * back_len);
 	merror(str[1]);
-	ft_strlcpy(str[0], line + start_idx, front_len);
+	ft_strlcpy(str[0], line, front_len);
 	ft_strlcpy(str[1], line + sep_idx, back_len);
+	free(line);
 	return (str);
 }
 
@@ -211,13 +214,13 @@ char	*make_new_string(char *buf, int buf_len)
 	return (str);
 }
 
-char	*fillin_buf(char *buf, char *origin, t_info *info)
+char	*fillin_buf(char *buf, char *origin, int start_idx, t_info *info)
 {
 	int		i;
 	int		j;
 	t_type	type;
 
-	i = 0;
+	i = start_idx;
 	j = 0;
 	while (origin[i])
 	{
@@ -229,7 +232,6 @@ char	*fillin_buf(char *buf, char *origin, t_info *info)
 			{
 				while (check_type(origin[i]) != SQUOTE)
 					buf[j++] = origin[i++];
-				i++;
 			}
 			else
 			{
@@ -243,6 +245,7 @@ char	*fillin_buf(char *buf, char *origin, t_info *info)
 					buf[j++] = origin[i++];
 				}
 			}
+			i++;
 		}
 		else
 			buf[j++] = origin[i++];
@@ -260,15 +263,7 @@ char	*make_arrange_string(char *front, char *back, int *start_idx)
 	return (new);
 }
 
-void	clear_string(char *line, char **divide)
-{
-	free(line);
-	free(divide[0]);
-	free(divide[1]);
-	free(divide);
-}
-
-char	*clean_quote_before_space(char *line, int *start_idx, int sep_idx, t_info *info)
+char	*clear_quote(char *line, int *start_idx, int sep_idx, t_info *info)
 {
 	/*
 	1. space인덱스를 구분자로 2개의 문자열로 쪼개기
@@ -281,11 +276,11 @@ char	*clean_quote_before_space(char *line, int *start_idx, int sep_idx, t_info *
 	char	*new;
 	char	**divide;
 
-	divide = divide_by_separator(line, *start_idx, sep_idx);
+	divide = divide_by_separator(line, sep_idx);
 	buf = make_buf();
-	new = fillin_buf(buf, divide[0], info);
+	new = fillin_buf(buf, divide[0], *start_idx, info);
 	new = make_arrange_string(new, divide[1], start_idx);
-	clear_string(line, divide);//free
+	free_env_list(divide);
 	return (new);
 }
 
@@ -295,29 +290,203 @@ char	*clean_quote_before_space(char *line, int *start_idx, int sep_idx, t_info *
 ** =============================================================================
 */
 
-void	skip_separator(char *line, int *start_idx)
+char	*remove_space(char *line, int start_idx)
 {
-	while (line[*start_idx] && find_separator(line, *start_idx))
-		(*start_idx)++;
+	int	i;
+	int	space_len;
+	char	*front;
+	char	*back;
+	char	*new;
+
+	if (check_type(line[start_idx]) != SPCE)
+		return (line);
+	i = start_idx;
+	while (check_type(line[i]) == SPCE)
+		i++;
+	space_len = i - start_idx;
+	front = (char *)malloc(sizeof(char) * (start_idx + 1));
+	merror(front);
+	ft_strlcpy(front, line, start_idx + 1);
+	back = ft_strdup(line + i);
+	merror(back);
+	new = ft_strjoin(front, back);
+	free(front);
+	free(back);
+	free(line);
+	return (new);
+}
+
+void	skip_separator_not_space(char *line, int *i)
+{
+	t_type	type;
+
+	type = check_type(line[*i]);
+	while (is_separator(type))
+	{
+		if (type == SPCE || type == END)
+			return ;
+		*i++;
+		type = check_type(line[*i]);
+	}
+}
+
+char	*skip_space(char *line, int *start_idx)
+{
+	int		i;
+	char	*new;
+	t_type	type;
+
+	if (line[*start_idx])
+		*start_idx++;
+	i = *start_idx;
+	new = ft_strdup(line);
+	merror(new);
+	free(line);
+	type = check_type(line[i]);
+	while (is_separator(type))
+	{
+		new = remove_space(new, i);
+		skip_separator_not_space(new, &i);
+	}
+	return (new);
 }
 
 char	*pre_processing(char *line, t_info *info)
 {
 	int		start_idx;
 	int		sep_idx;
+	int		end_flag;
 	char	*new;
 
 	start_idx = 0;
 	sep_idx = 0;
+	end_flag = FALSE;
 	new = ft_strdup(line);
-	sep_idx = find_separator(new, sep_idx);//space뿐만 아니라 파이프,리다이렉션도 구분자가 됨.
-	while (sep_idx)
+	free(line);
+	while (TRUE)
 	{
-		new = clean_quote_before_space(new, &start_idx, sep_idx, info);
-		skip_separator(new, &start_idx);
 		sep_idx = find_separator(new, start_idx);
+		if (new[sep_idx] == '\0')
+			end_flag = TRUE;
+		new = clear_quote(new, &start_idx, sep_idx, info);
+		new = skip_space(new, &start_idx);
+		if (end_flag)
+			break ;
 	}
 	return (new);
+}
+
+int	count_command(char *line)
+{
+	int sep_idx;
+	int	sep_cnt;
+
+	sep_idx = 0;
+	sep_cnt = 0;
+	sep_idx = find_separator(line, sep_idx);
+	while (sep_idx)
+	{
+		sep_cnt++;
+		sep_idx = find_separator(line, sep_idx);
+	}
+	return (sep_cnt + 1);
+}
+
+char	**divide_by_command(char *line, t_info *info)
+{
+	int		i;
+	int		pre_idx;
+	int		cur_idx;
+	char	**cmd;
+
+	info->n_cmd = count_command(line);
+	info->n_pipeline = info->n_cmd;//나중에 개수 조절해줌.
+	cmd = (char **)malloc(sizeof(char *) * (info->n_cmd + 1));
+	merror(cmd);
+	ft_memset(cmd, 0, sizeof(char *) * (info->n_cmd + 1));
+	i = 0;
+	pre_idx = 0;
+	while (i < info->n_cmd)
+	{
+		cur_idx = find_separator(line, pre_idx);
+		if (cur_idx == FALSE)
+			cur_idx = (int)ft_strlen(line);
+		cmd[i] = (char *)malloc(sizeof(char) * (cur_idx - pre_idx + 1));
+		merror(cmd[i]);
+		ft_strlcpy(cmd[i], line + pre_idx, cur_idx - pre_idx + 1);
+		pre_idx = cur_idx;
+		if (!is_redirection(line[pre_idx]))
+			pre_idx++;
+	}
+	free(line);
+	return (cmd);
+}
+
+int	check_redirection(t_cmd *cmds)
+{
+	int		i;
+	char	*tmp;
+
+	i = 0;
+	while (is_redirection(cmds->cmd[0][i]))
+		i++;
+	if (i == 0)
+		return (FALSE);
+	else if (i == 1)
+	{
+		cmds->redi = check_type(cmds->cmd[0][1]);
+		tmp = ft_strdup(cmds->cmd[0] + 1);
+		free(cmds->cmd[0]);
+		cmds->cmd[0] = tmp;
+	}
+	else
+	{
+		// <>는 예외처리하는 로직
+		if (check_type(cmds->cmd[0][1]) == RRDI)
+			cmds->redi = DRRDI;
+		else
+			cmds->redi = DLRDI;
+		tmp = ft_strdup(cmds->cmd[0] + 2);
+		free(cmds->cmd[0]);
+		cmds->cmd[0] = tmp;
+	}
+	return (TRUE);
+}
+
+void	make_command_array(char **cmd, t_info *info)
+{
+	int		i;
+	t_cmd	*cmds;
+
+	cmds = (t_cmd *)malloc(sizeof(t_cmd) * info->n_cmd);
+	merror(cmds);
+	ft_memset(cmds, 0, sizeof(t_cmd) * info->n_cmd);
+	i = 0;
+	while (i < info->n_cmd)
+	{
+		cmds[i].cmd = ft_split(cmd[i], '\"');
+		merror(cmds[i].cmd);
+		if (check_redirection(&(cmds[i])))
+			info->n_pipeline--;
+		i++;
+	}
+	info->cmds = cmds;
+}
+
+void	make_command(char *line, t_info *info)
+{
+	/*
+	1. 구분자로 split, 구분자는 ", |, >, <, but, | < > >> <<는 살리거나 flag에 값을 넣어줌
+	2. ""는 1차원 배열 구분자
+	3. 파이프, 리다이렉션은 2차원 배열 구분자
+	4. 파이프 리다이렉션으로 먼저 split, 리다이렉션은 구조체 플래그에 값 넣어줌.
+	5. 쪼개진 문자열 만큼 구조체 할당하고
+	6. 각 구조체에 쪼개진 문자열하나씩 ""로 split
+	*/
+	char	**cmd;
+
+	cmd = divide_by_command(line, info);
+	make_command_array(cmd, info);
 }
 
 int	parse_line(char *line, t_info *info)
