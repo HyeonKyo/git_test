@@ -34,6 +34,8 @@ t_type	check_type(char c)
 		return (SQUOTE);
 	else if (is_space(c))
 		return (SPCE);
+	else if (c == '|')
+		return (PIPE);
 	// else if (is_special(c))
 	// 	return (SPEC);
 	else if (c == '$')
@@ -91,6 +93,7 @@ int	check_incorrect_line(char *line)
 		//리다이렉션 체크 추가
 		//1. <>처럼 다른 게 연속으로 올 떄
 		//2. >>> 처럼 3개 이상이 연속으로 올때
+		//3. double pipe인지
 		i++;
 	}
 	if ((squote_cnt & ISODD) || (dquote_cnt & ISODD))
@@ -156,7 +159,7 @@ char	*make_buf(void)
 {
 	char	*buf;
 
-	buf = (char *)malloc(sizeof(char) * 2147483647);//나중에 디파인 상수로 변경
+	buf = (char *)malloc(sizeof(char) * 20000);//나중에 디파인 상수로 변경
 	merror(buf);
 	return (buf);
 }
@@ -221,7 +224,8 @@ char	*fillin_buf(char *buf, char *origin, int start_idx, t_info *info)
 	t_type	type;
 
 	i = start_idx;
-	j = 0;
+	j = i;
+	ft_strlcpy(buf, origin, start_idx + 1);
 	while (origin[i])
 	{
 		type = check_type(origin[i]);
@@ -276,6 +280,7 @@ char	*clear_quote(char *line, int *start_idx, int sep_idx, t_info *info)
 	char	*new;
 	char	**divide;
 
+	//sep_idx >= start_idx 
 	divide = divide_by_separator(line, sep_idx);
 	buf = make_buf();
 	new = fillin_buf(buf, divide[0], *start_idx, info);
@@ -336,18 +341,20 @@ char	*skip_space(char *line, int *start_idx)
 	char	*new;
 	t_type	type;
 
-	if (line[*start_idx])
-		(*start_idx)++;
 	i = *start_idx;
 	new = ft_strdup(line);
 	merror(new);
 	free(line);
-	type = check_type(line[i]);
+	type = check_type(new[i]);
 	while (is_separator(type))
 	{
 		new = remove_space(new, i);
 		skip_separator_not_space(new, &i);
+		type = check_type(new[i]);
+		if (type == END)
+			break ;
 	}
+	*start_idx = i;
 	return (new);
 }
 
@@ -366,7 +373,7 @@ char	*pre_processing(char *line, t_info *info)
 	while (TRUE)
 	{
 		sep_idx = find_separator(new, start_idx);
-		if (new[sep_idx] == '\0')
+		if (start_idx && sep_idx == 0)
 			end_flag = TRUE;
 		new = clear_quote(new, &start_idx, sep_idx, info);
 		new = skip_space(new, &start_idx);
