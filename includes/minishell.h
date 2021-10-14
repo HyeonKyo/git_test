@@ -61,8 +61,8 @@ typedef enum e_type
 
 typedef struct s_pipex
 {
-	int		new_pipe[2];
-	int		old_pipe[2];
+	int		**pipe_fd;
+	int		*pid;
 	char	*limiter;
 	int		is_here_doc;
 }	t_pipex;
@@ -77,12 +77,10 @@ typedef struct s_info
 {
 	char	**env_path;
 	char	**env_list;
-	char	**cmd;
 	t_cmd	*cmds;
 	int		cmd_sequence;
-	int		cmd_total_number;
 	int		n_cmd;
-	int		n_pipeline;
+	int		n_pipe;
 	char	*infile_name;
 	char	*outfile_name;
 	t_pipex pipex;
@@ -94,15 +92,19 @@ typedef struct s_info
 ** =============================================================================
 */
 
-int		execute_shell_command(t_info *info, int depth);
-void	execute_command(t_info *info, char **cmd, int fd[]);
-// void	execute_input_command(t_info *info, char **cmd, int fd[]);
-// void	execute_output_command(t_info *info, char **cmd, int fd[]);
-int		get_fd_will_be_stdin(t_info *info, int is_redirection);
-int		get_fd_will_be_stdout(t_info *info, int is_redirection);
-void	print_error(char *output_string);
-void	free_two_dimensional(char **two_dimensional);
+void	execute_command_main(t_info *info);
+void	execute_command(t_info *info, int depth);
+void	execute_execve_function(t_info *info, int depth);
+int		get_fd_will_be_stdin(t_info *info, int depth, int is_redirection);
+int		get_fd_will_be_stdout(t_info *info, int depth, int is_redirection);
 void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
+
+void	make_pipeline(t_info *info);
+void	close_pipeline(t_info *info);
+
+int		is_builtin_command(t_info *info);
+
+void	free_two_dimensional(char **two_dimensional);
 
 char	*make_cursor_string(void);
 

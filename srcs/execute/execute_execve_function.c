@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-static char	*get_path_of_command(char **env_path, char *cmd)
+char	*get_path_of_command(char **env_path, char *cmd)
 {
 	int		idx;
 	int		end;
@@ -12,7 +12,7 @@ static char	*get_path_of_command(char **env_path, char *cmd)
 	path_of_cmd = NULL;
 	while (idx < end)
 	{
-		if (stat(cmd, &file_stat) == 0)//2.access함수 사용 가능한지?
+		if (stat(cmd, &file_stat) == 0)
 			return (cmd);
 		path_of_cmd = ft_strjoin(env_path[idx], cmd);
 		if (stat(path_of_cmd, &file_stat) == 0)
@@ -29,7 +29,7 @@ int	is_builtin_command(t_info *info)
 	char	**cmd;
 	int		cmd_len;
 
-	cmd = ft_split(info->cmd[info->cmd_sequence], ' ');
+	cmd = info->cmds[info->cmd_sequence].cmd;
 	cmd_len = ft_strlen(cmd[0]);
 	if (!ft_strncmp(cmd[0], "cd", cmd_len))
 		return (TRUE);
@@ -46,37 +46,29 @@ int	is_builtin_command(t_info *info)
 	return (FALSE);
 }
 
-void	execute_command(t_info *info, char **cmd, int fd[])
+void	execute_execve_function(t_info *info, int depth)
 {
-	int		pid;
-	int		exit_status_of_child;
 	char	*path_of_cmd;
+	int		fd[2];
 
-	if (is_builtin_command(info) && !(info->n_pipeline))
+	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
+	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
+	path_of_cmd
+		= get_path_of_command(info->env_path, info->cmds[depth].cmd[0]);
+	switch_stdio(info, fd[READ], fd[WRITE]);
+	if (is_builtin_command(info))
 	{
 		builtin(info, fd);
+		if (info->n_cmd > 1)
+			exit(1);
+		/*execve()는 알아서 프로세스가 교체되지만 builtin함수는 직접 exit을 해줘야한다. 안그러면 무한반복
+		커맨드가 하나 일 때는 부모에서 실행되기 때문에 exit되면 안됨*/
+
 	}
 	// else if (is_redirection_command(info))
 	// { 빌트인이나 리다이렉션이 아니면 자식 프로세스 만들어서 작업
 	// 	execute_redirection(info);
 	// }
 	else
-	{
-		pid = fork();
-		if (pid == -1)
-			error();
-		else if (pid > 0)
-		{
-			if (waitpid(pid, &exit_status_of_child, 0) == -1)
-				error();
-		}
-		else if (pid == 0)
-		{
-			path_of_cmd
-				= get_path_of_command(info->env_path, cmd[0]);
-			switch_stdio(info, fd[READ], fd[WRITE]);
-			execve(path_of_cmd, cmd, info->env_list);
-			builtin(info, fd);//위에거랑 순서 바꾸고 빌트인 실행 했는지 아닌지 확인 후 exe실행하기
-		}
-	}
+		execve(path_of_cmd, info->cmds[depth].cmd, info->env_list);
 }

@@ -1,27 +1,5 @@
 # include "minishell.h"
 
-static char	*get_path_of_command(char **environment_path, char *command)
-{
-	int		idx;
-	int		end;
-	char	*path_of_commnad;
-
-	idx = 0;
-	end = sizeof(environment_path);
-	path_of_commnad = NULL;
-	while (idx < end)
-	{
-		if (access(command, F_OK) == 0)
-			return (command);
-		path_of_commnad = ft_strjoin(environment_path[idx], command);
-		if (access(path_of_commnad, F_OK) == 0)
-			return (path_of_commnad);
-		free(path_of_commnad);
-		idx++;
-	}
-	return (path_of_commnad);
-}
-
 static void	add_slash_at_end_of_path(t_info *info, char **environment_path)
 {
 	int		idx;
@@ -94,7 +72,7 @@ void	get_line(t_info *info)
 	// info->cmd_sequence = 0;
 	// int	fd[2] = {0, 1};
 	// builtin(info, fd);
-	execute_shell_command(info, info->n_pipeline);
+	execute_command_main(info);
 }
 
 int	main(int arc, char *arvg[], char *envp[])

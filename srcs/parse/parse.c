@@ -34,8 +34,8 @@ t_type	check_type(char c)
 		return (SQUOTE);
 	else if (is_space(c))
 		return (SPCE);
-	else if (is_special(c))
-		return (SPEC);
+	// else if (is_special(c))
+	// 	return (SPEC);
 	else if (c == '$')
 		return (DOLR);
 	else if (c == '\0')
@@ -325,7 +325,7 @@ void	skip_separator_not_space(char *line, int *i)
 	{
 		if (type == SPCE || type == END)
 			return ;
-		*i++;
+		(*i)++;
 		type = check_type(line[*i]);
 	}
 }
@@ -337,7 +337,7 @@ char	*skip_space(char *line, int *start_idx)
 	t_type	type;
 
 	if (line[*start_idx])
-		*start_idx++;
+		(*start_idx)++;
 	i = *start_idx;
 	new = ft_strdup(line);
 	merror(new);
@@ -400,7 +400,7 @@ char	**divide_by_command(char *line, t_info *info)
 	char	**cmd;
 
 	info->n_cmd = count_command(line);
-	info->n_pipeline = info->n_cmd;//나중에 개수 조절해줌.
+	info->n_pipe = info->n_cmd;//나중에 개수 조절해줌.
 	cmd = (char **)malloc(sizeof(char *) * (info->n_cmd + 1));
 	merror(cmd);
 	ft_memset(cmd, 0, sizeof(char *) * (info->n_cmd + 1));
@@ -467,7 +467,7 @@ void	make_command_array(char **cmd, t_info *info)
 		cmds[i].cmd = ft_split(cmd[i], '\"');
 		merror(cmds[i].cmd);
 		if (check_redirection(&(cmds[i])))
-			info->n_pipeline--;
+			info->n_pipe--;
 		i++;
 	}
 	info->cmds = cmds;
