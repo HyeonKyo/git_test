@@ -8,7 +8,7 @@ int	get_fd_will_be_stdin(t_info *info, int depth, int is_redirection)
 	if (info->pipex.is_here_doc)
 		// fd = read_string_from_stdin(info); /*here_doc '<<'*/
 		fd = 0;
-	else if (info->pipe_cnt && info->cmd_sequence != 0)
+	else if (info->n_pipe && info->cmd_sequence != 0)
 	{
 		fd = info->pipex.pipe_fd[depth][READ];
 	}
@@ -26,9 +26,9 @@ int	get_fd_will_be_stdout(t_info *info, int depth, int is_redirection)
 	int		fd;
 
 	fd = STDOUT_FILENO;
-	if (info->pipe_cnt)
+	if (info->n_pipe)
 	{
-		if (depth < (info->cmd_cnt - 1))
+		if (depth < (info->n_cmd - 1))
 			fd = info->pipex.pipe_fd[depth + 1][WRITE];
 	}
 	if (is_redirection)

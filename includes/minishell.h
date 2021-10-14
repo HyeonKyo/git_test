@@ -77,17 +77,10 @@ typedef struct s_info
 {
 	char	**env_path;
 	char	**env_list;
-	char	**cmd;
 	t_cmd	*cmds;
 	int		cmd_sequence;
-<<<<<<< HEAD
-	int		cmd_cnt;
-	int		pipe_cnt;
-=======
-	int		cmd_total_number;
 	int		n_cmd;
-	int		n_pipeline;
->>>>>>> fc86deb9c32eb784fc11a5593adb9319a54e9f2a
+	int		n_pipe;
 	char	*infile_name;
 	char	*outfile_name;
 	t_pipex pipex;
@@ -99,7 +92,7 @@ typedef struct s_info
 ** =============================================================================
 */
 
-void	execute_command_main(t_info *info, int depth);
+void	execute_command_main(t_info *info);
 void	execute_command(t_info *info, int depth);
 void	execute_execve_function(t_info *info, int depth);
 int		get_fd_will_be_stdin(t_info *info, int depth, int is_redirection);

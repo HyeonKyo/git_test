@@ -5,7 +5,7 @@ int	builtin(t_info *info, int *fd)
 	char	**cmd;
 	int		cmd_len;
 
-	cmd = ft_split(info->cmd[info->cmd_sequence], ' ');
+	cmd = info->cmds[info->cmd_sequence].cmd;
 	cmd_len = ft_strlen(cmd[0]);
 	if (!ft_strncmp(cmd[0], "cd", cmd_len))
 		cd(cmd[1]);

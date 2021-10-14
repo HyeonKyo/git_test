@@ -29,7 +29,7 @@ int	is_builtin_command(t_info *info)
 	char	**cmd;
 	int		cmd_len;
 
-	cmd = ft_split(info->cmd[info->cmd_sequence], ' ');
+	cmd = info->cmds[info->cmd_sequence].cmd;
 	cmd_len = ft_strlen(cmd[0]);
 	if (!ft_strncmp(cmd[0], "cd", cmd_len))
 		return (TRUE);
@@ -49,28 +49,26 @@ int	is_builtin_command(t_info *info)
 void	execute_execve_function(t_info *info, int depth)
 {
 	char	*path_of_cmd;
-	char	**command;
 	int		fd[2];
 
 	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
 	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
-	command = ft_split(info->cmd[depth], ' ');
 	path_of_cmd
-		= get_path_of_command(info->env_path, command[0]);
+		= get_path_of_command(info->env_path, info->cmds[depth].cmd[0]);
 	switch_stdio(info, fd[READ], fd[WRITE]);
 	if (is_builtin_command(info))
 	{
 		builtin(info, fd);
-		if (info->cmd_cnt > 1)
+		if (info->n_cmd > 1)
 			exit(1);
 		/*execve()는 알아서 프로세스가 교체되지만 builtin함수는 직접 exit을 해줘야한다. 안그러면 무한반복
 		커맨드가 하나 일 때는 부모에서 실행되기 때문에 exit되면 안됨*/
-					
+
 	}
 	// else if (is_redirection_command(info))
 	// { 빌트인이나 리다이렉션이 아니면 자식 프로세스 만들어서 작업
 	// 	execute_redirection(info);
 	// }
 	else
-		execve(path_of_cmd, command, info->env_list);
+		execve(path_of_cmd, info->cmds[depth].cmd, info->env_list);
 }

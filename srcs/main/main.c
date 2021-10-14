@@ -72,7 +72,7 @@ void	get_line(t_info *info)
 	// info->cmd_sequence = 0;
 	// int	fd[2] = {0, 1};
 	// builtin(info, fd);
-	execute_command_main(info, 0);
+	execute_command_main(info);
 }
 
 int	main(int arc, char *arvg[], char *envp[])

@@ -5,7 +5,7 @@ void	close_pipeline(t_info *info)
 	int	idx;
 
 	idx = 0;
-	while (idx < info->cmd_cnt)
+	while (idx < info->n_cmd)
 	{
 		close(info->pipex.pipe_fd[idx][READ]);
 		close(info->pipex.pipe_fd[idx][WRITE]);
