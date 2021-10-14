@@ -130,4 +130,7 @@ int		builtin(t_info *info, int *fd);
 
 void	free_env_list(char **list);
 
+//parsing
+int		parse_line(char *line, t_info *info);
+
 #endif
