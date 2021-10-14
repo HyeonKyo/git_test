@@ -3,22 +3,19 @@
 size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 {
 	size_t	i;
-	size_t	length;
+	size_t	len;
 
-	if (!dest || !src)
-		return (0);
+	len = 0;
 	i = 0;
-	length = ft_strlen(src);
-	if (!size)
-		return (length);
-	while (i < size)
+	if (src == NULL)
+		return (0);
+	len = ft_strlen(src);
+	while (i + 1 < size && src[i])
 	{
-		if (src[i] == '\0')
-			break ;
 		dest[i] = src[i];
 		i++;
 	}
-	if (size > 0)
+	if (size != 0)
 		dest[i] = '\0';
-	return (length);
+	return (len);
 }

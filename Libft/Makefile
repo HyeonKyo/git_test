@@ -29,10 +29,10 @@ bonus :
 	make BOUS_RELINK=1 all
 
 clean :
-	rm -f $(OBJS) $(OBJS_B)
+	@rm -f $(OBJS) $(OBJS_B)
 
 fclean : clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 re :
 	make fclean
