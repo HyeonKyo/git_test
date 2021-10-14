@@ -43,7 +43,7 @@ int	make_new_list(t_info *info)
 	while (++i < list_len)
 		new[i] = env_list[i];
 	new[i] = NULL;
-	free_env_list(env_list);
+	free_double_string(env_list);
 	info->env_list = new;
 	return (list_len);
 }
@@ -60,7 +60,7 @@ char	*get_env_value(char *env_key, t_info *info)
 	env = ft_split(info->env_list[env_idx], '=');
 	merror(env);
 	env_value = ft_strdup(env[1]);
-	free_env_list(env);
+	free_double_string(env);
 	return (env_value);
 }
 

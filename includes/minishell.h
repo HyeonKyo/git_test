@@ -35,6 +35,12 @@
 # define READ 0
 # define WRITE 1
 
+# define FRONT 0
+# define MID 1
+# define BACK 2
+
+# define BUF_SIZE 20000
+
 # define ISODD 1
 
 /*
@@ -130,7 +136,7 @@ void	sig_handler(int signo);
 
 int		builtin(t_info *info, int *fd);
 
-void	free_env_list(char **list);
+void	free_double_string(char **list);
 
 //parsing
 int		parse_line(char *line, t_info *info);

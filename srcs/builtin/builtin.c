@@ -21,9 +21,9 @@ int	builtin(t_info *info, int *fd)
 		exit(0);
 	else
 	{
-		free_env_list(cmd);
+		free_double_string(cmd);
 		return (FALSE);//명령어 없을 때
 	}
-	free_env_list(cmd);
+	free_double_string(cmd);
 	return (TRUE);
 }

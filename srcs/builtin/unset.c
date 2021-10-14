@@ -24,7 +24,7 @@ void	del_env_value(int idx, t_info *info)
 		new[i++] = env_list[j++];
 	}
 	new[i] = NULL;
-	free_env_list(env_list);
+	free_double_string(env_list);
 	info->env_list = new;
 }
 

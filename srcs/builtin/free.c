@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-void	free_env_list(char **list)
+void	free_double_string(char **list)
 {
 	int	i;
 
