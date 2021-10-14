@@ -59,7 +59,8 @@ OBJS_LST	=	main.o						\
 				free_two_dimensional.o		\
 				parse.o						\
 				signal.o					\
-				error.o
+				error.o						\
+				list.o
 OBJS		=	$(addprefix $(OBJS_DIR), $(OBJS_LST))
 
 # =============================================================================

@@ -61,42 +61,44 @@ int	is_separator(t_type type)
 ** =============================================================================
 */
 
+void	init_quote_data(t_quote *data)
+{
+	data->squote_flag = 0;
+	data->dquote_flag = 0;
+	data->squote_cnt = 0;
+	data->dquote_cnt = 0;
+}
 
 int	check_incorrect_line(char *line)
 {
-	int	i;
-	int	squote_flag;
-	int	dquote_flag;
-	int	squote_cnt;
-	int	dquote_cnt;
+	int		i;
+	t_quote	data;
 
-	squote_flag = FALSE;
-	dquote_flag = FALSE;
+	init_quote_data(&data);
 	i = 0;
-	squote_cnt = 0;
-	dquote_cnt = 0;
 	while (line[i])
 	{
-		if (check_type(line[i]) == SQUOTE && dquote_flag == FALSE)
+		if (check_type(line[i]) == SQUOTE && data.dquote_flag == FALSE)
 		{
-			squote_cnt++;
-			squote_flag ^= TRUE;
+			data.squote_cnt++;
+			data.squote_flag ^= TRUE;
 		}
-		else if (check_type(line[i]) == DQUOTE && squote_flag == FALSE)
+		else if (check_type(line[i]) == DQUOTE && data.squote_flag == FALSE)
 		{
-			dquote_cnt++;
-			dquote_flag ^= TRUE;
+			data.dquote_cnt++;
+			data.dquote_flag ^= TRUE;
 		}
-		if (!squote_flag && !dquote_flag &&
+		if (!data.squote_flag && !data.dquote_flag &&
 			(line[i] == ';' || line[i] == '\\'))
 			return (TRUE);
 		//리다이렉션 체크 추가
 		//1. <>처럼 다른 게 연속으로 올 떄
 		//2. >>> 처럼 3개 이상이 연속으로 올때
-		//3. double pipe인지
+		//double pipe인지
+		//맨처음line[0]이 separator인지
 		i++;
 	}
-	if ((squote_cnt & ISODD) || (dquote_cnt & ISODD))
+	if ((data.squote_cnt & ISODD) || (data.dquote_cnt & ISODD))
 		return (TRUE);
 	return (FALSE);
 	/*
@@ -208,15 +210,30 @@ void	replace_env_value(char **origin, int *i, t_info *info)
 	free(new);
 }
 
+char	choose_quote_type(char *buf, int buf_len)
+{
+	int	i;
+
+	i = 0;
+	while (i < buf_len)
+	{
+		if (buf[i++] == '\"')
+			return ('\'');
+	}
+	return ('\"');
+}
+
 char	*make_new_string(char *buf, int buf_len)
 {
 	char	*str;
+	char	quote;
 
 	str = (char *)malloc(sizeof(char) * (buf_len + 3));//양쪽에 ""넣어줄 공간까지 추가
 	merror(str);
-	str[0] = '\"';
+	quote = choose_quote_type(buf, buf_len);
+	str[0] = quote;
 	ft_strlcpy(str + 1, buf, buf_len + 1);
-	str[buf_len + 1] = '\"';
+	str[buf_len + 1] = quote;
 	str[buf_len + 2] = '\0';
 	free(buf);
 	return (str);
@@ -238,12 +255,12 @@ char	*fillin_buf(char *buf, char *origin, t_info *info)
 			i++;
 			if (type == SQUOTE)
 			{
-				while (check_type(origin[i]) != SQUOTE)
+				while (check_type(origin[i]) != SQUOTE && origin[i])
 					buf[j++] = origin[i++];
 			}
 			else
 			{
-				while (check_type(origin[i]) != DQUOTE)
+				while (check_type(origin[i]) != DQUOTE && origin[i])
 				{
 					if (type == DOLR)
 					{
@@ -406,8 +423,13 @@ int	count_command(char *line)
 	sep_idx = find_separator(line, sep_idx);
 	while (sep_idx)
 	{
+		while (sep_idx && check_type(line[sep_idx]) != PIPE)
+		{
+			sep_idx = find_separator(line, sep_idx);
+			if (sep_idx != 0)
+				sep_idx++;
+		}
 		sep_cnt++;
-		sep_idx = find_separator(line, sep_idx);
 	}
 	return (sep_cnt + 1);
 }
@@ -426,71 +448,139 @@ char	**divide_by_command(char *line, t_info *info)
 	ft_memset(cmd, 0, sizeof(char *) * (info->n_cmd + 1));
 	i = 0;
 	pre_idx = 0;
+	cur_idx = 1;
 	while (i < info->n_cmd)
 	{
-		cur_idx = find_separator(line, pre_idx);
-		if (cur_idx == FALSE)
+		while (check_type(line[cur_idx]) != PIPE && cur_idx)
+			cur_idx = find_separator(line, cur_idx);
+		if (cur_idx == 0)
 			cur_idx = (int)ft_strlen(line);
 		cmd[i] = (char *)malloc(sizeof(char) * (cur_idx - pre_idx + 1));
 		merror(cmd[i]);
 		ft_strlcpy(cmd[i], line + pre_idx, cur_idx - pre_idx + 1);
-		pre_idx = cur_idx;
-		if (!is_redirection(line[pre_idx]))
-			pre_idx++;
+		pre_idx = cur_idx + 1;
+		i++;
 	}
 	free(line);
 	return (cmd);
 }
 
-int	check_redirection(t_cmd *cmds)
+int	check_redirection(char *cmd)
+{
+	if (is_redirection(cmd[0]))
+		return (TRUE);
+	return (FALSE);
+}
+
+int	find_quote_idx(char *cmd, int *idx)
+{
+	/*
+	끝까지 가면 FALSE리턴
+	1. 처음에 quote만나면 idx++하면서 flag세우기
+	2. flag닫힐떄까지 쭉 넘김
+	3. 닫힌 flag의("의)idx를 리턴
+	=> 이 로직으로 하기 위해 파싱 작업에서 일반문자열 안에 "가 있으면 '로 양끝을 묶고
+		그 외의 경우는 "로 양끝을 묶도록 작업해줌.
+	*/
+	t_quote	data;
+
+	init_quote_data(&data);
+	while (cmd[*idx])
+	{
+		if (cmd[*idx] == '\"' && data.squote_flag == FALSE)
+		{
+			data.dquote_flag ^= TRUE;
+			(*idx)++;
+			while(cmd[*idx] != '\"' && cmd[*idx] != 0)
+				(*idx)++;
+			if (cmd[*idx] == '\"')
+				return (TRUE);
+			return (FALSE);
+		}
+		if (cmd[*idx] == '\'' && data.dquote_flag == FALSE)
+		{
+			data.squote_flag ^= TRUE;
+			(*idx)++;
+			while(cmd[*idx] != '\'' && cmd[*idx] != 0)
+				(*idx)++;
+			if (cmd[*idx] == '\'')
+				return (TRUE);
+			return (FALSE);
+		}
+		(*idx)++;
+
+	}
+}
+
+char	**quote_split(char *cmd)
 {
 	int		i;
-	char	*tmp;
+	int		quote_idx;
+	int		pre_idx;
+	int		str_cnt;
+	char	**cmd_lst;
+	t_quote	data;
 
+	init_quote_data(&data);
+	str_cnt = 1;
 	i = 0;
-	while (is_redirection(cmds->cmd[0][i]))
+	//make_cmd_lst
+	while (find_quote_idx(cmd, &i))
+		str_cnt++;
+	cmd_lst = (char **)malloc(sizeof(char *) * (str_cnt + 1));
+	merror(cmd_lst);
+	cmd_lst[str_cnt] = NULL;
+	//--
+	i = 0;
+	quote_idx = 0;
+	pre_idx = 0;
+	while (i < str_cnt)
+	{
+		find_quote_idx(cmd, &quote_idx);
+		cmd_lst[i] = (char *)malloc(sizeof(char) * (quote_idx + 1));
+		merror(cmd_lst[i]);
+		ft_strlcpy(cmd_lst[i], cmd + quote_idx, quote_idx - pre_idx + 1);
+		pre_idx = ++quote_idx;
 		i++;
-	if (i == 0)
-		return (FALSE);
-	else if (i == 1)
-	{
-		cmds->redi = check_type(cmds->cmd[0][1]);
-		tmp = ft_strdup(cmds->cmd[0] + 1);
-		free(cmds->cmd[0]);
-		cmds->cmd[0] = tmp;
 	}
-	else
-	{
-		// <>는 예외처리하는 로직
-		if (check_type(cmds->cmd[0][1]) == RRDI)
-			cmds->redi = DRRDI;
-		else
-			cmds->redi = DLRDI;
-		tmp = ft_strdup(cmds->cmd[0] + 2);
-		free(cmds->cmd[0]);
-		cmds->cmd[0] = tmp;
-	}
-	return (TRUE);
+	return (cmd_lst);
 }
 
 void	make_command_array(char **cmd, t_info *info)
 {
 	int		i;
-	t_cmd	*cmds;
+	int		j;
+	char	**split_cmd;
+	t_cmd	*cmd_lst;
 
-	cmds = (t_cmd *)malloc(sizeof(t_cmd) * info->n_cmd);
-	merror(cmds);
-	ft_memset(cmds, 0, sizeof(t_cmd) * info->n_cmd);
+	cmd_lst = (t_cmd *)malloc(sizeof(t_cmd) * info->n_cmd);
+	merror(cmd_lst);
+	ft_memset(cmd_lst, 0, sizeof(t_cmd) * info->n_cmd);
 	i = 0;
 	while (i < info->n_cmd)
 	{
-		cmds[i].cmd = ft_split(cmd[i], '\"');
-		merror(cmds[i].cmd);
-		if (check_redirection(&(cmds[i])))
-			info->n_pipe--;
+		/*
+		1. cmd[i]를 "로 스필릿(일반 문자 "는 스킵하는 로직 추가)
+		2. 문자열 하나씩 봄.
+		3. check_redirect를 함.
+		4. redirect가 아니면 그 문자열 그대로 노드 만들어서 저장 후 text에 저장
+		5. redirect면 redirect + 문자열 조합이 되어서 파싱되어있으므로
+			그대로 노드 만들어서 redi리스트에 저장
+		*/
+		split_cmd = quote_split(cmd[i]);
+		j = 0;
+		while (split_cmd[j] != NULL)
+		{			//리다이렉션 문자가 일반문자인지 아닌지 판별하는 로직 추가해야함.
+			if (check_redirection(split_cmd[j]))
+				link_node(split_cmd[j], &(cmd_lst[i].redi));
+			else
+				link_node(split_cmd[j], &(cmd_lst[i].text));
+			j++;
+		}
+		free_double_string(split_cmd);
 		i++;
 	}
-	info->cmds = cmds;
+	info->cmd_lst = cmd_lst;
 }
 
 void	make_command(char *line, t_info *info)
@@ -511,12 +601,11 @@ void	make_command(char *line, t_info *info)
 
 int	parse_line(char *line, t_info *info)
 {
-	char	*cmd;
+	char	*new_line;
 
 	if (check_incorrect_line(line))
 		return (ERROR);
-	cmd = pre_processing(line, info);
-	//" '와 스페이스 처리함.
-	make_command(cmd, info);
+	new_line = pre_processing(line, info);
+	make_command(new_line, info);
 	return (NORMAL);
 }

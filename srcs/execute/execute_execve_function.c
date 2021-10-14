@@ -29,7 +29,7 @@ int	is_builtin_command(t_info *info)
 	char	**cmd;
 	int		cmd_len;
 
-	cmd = info->cmds[info->cmd_sequence].cmd;
+	//cmd = info->cmds[info->cmd_sequence].cmd;
 	cmd_len = ft_strlen(cmd[0]);
 	if (!ft_strncmp(cmd[0], "cd", cmd_len))
 		return (TRUE);
@@ -53,8 +53,8 @@ void	execute_execve_function(t_info *info, int depth)
 
 	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
 	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
-	path_of_cmd
-		= get_path_of_command(info->env_path, info->cmds[depth].cmd[0]);
+//	path_of_cmd
+//		= get_path_of_command(info->env_path, info->cmds[depth].cmd[0]);
 	switch_stdio(info, fd[READ], fd[WRITE]);
 	if (is_builtin_command(info))
 	{
@@ -69,6 +69,6 @@ void	execute_execve_function(t_info *info, int depth)
 	// { 빌트인이나 리다이렉션이 아니면 자식 프로세스 만들어서 작업
 	// 	execute_redirection(info);
 	// }
-	else
-		execve(path_of_cmd, info->cmds[depth].cmd, info->env_list);
+//	else
+//		execve(path_of_cmd, info->cmds[depth].cmd, info->env_list);
 }

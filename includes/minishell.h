@@ -73,17 +73,32 @@ typedef struct s_pipex
 	int		is_here_doc;
 }	t_pipex;
 
+typedef struct s_quote
+{
+	int	squote_flag;
+	int	dquote_flag;
+	int	squote_cnt;
+	int	dquote_cnt;
+}			t_quote;
+
+
+typedef struct s_lst
+{
+	char			*str;
+	struct s_lst	*next;
+}			t_lst;
+
 typedef struct s_cmd
 {
-	char	**cmd;
-	t_type	redi;
+	t_lst	*text;
+	t_lst	*redi;
 }			t_cmd;
 
 typedef struct s_info
 {
 	char	**env_path;
 	char	**env_list;
-	t_cmd	*cmds;
+	t_cmd	*cmd_lst;
 	int		cmd_sequence;
 	int		n_cmd;
 	int		n_pipe;
@@ -140,5 +155,9 @@ void	free_double_string(char **list);
 
 //parsing
 int		parse_line(char *line, t_info *info);
+
+//list.c
+t_lst	*create_node(void);
+void	link_node(char *cmd, t_lst **list);
 
 #endif
