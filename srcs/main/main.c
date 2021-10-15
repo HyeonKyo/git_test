@@ -60,19 +60,7 @@ void	get_line(t_info *info)
 		add_history(line);
 	if (parse_line(line, info))
 		error();
-	// info->cmd = (char **)malloc(sizeof(char * ) * 4);
-	// merror(info->cmd);
-	// info->cmd[0] = line;
-	// info->cmd[1] = ft_strdup("grep a"); //파이프라인 시험해볼려고 임시로 명령어 넣어놓음
-	// info->cmd[2] = ft_strdup("wc -l");//파이프라인 시험해볼려고 임시로 명령어 넣어놓음
-	// info->cmd[3] = NULL;
-	// // info->command = ft_split(line, ' ');//파싱 함수로 대체
-	// info->n_pipeline = 1;
-	// info->cmd_total_number = 2;
-	// info->cmd_sequence = 0;
-	// int	fd[2] = {0, 1};
-	// builtin(info, fd);
-	//execute_command_main(info);
+	execute_command_main(info);
 	return ;
 }
 

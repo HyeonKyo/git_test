@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char	*get_path_of_command(char **env_path, char *cmd)
+char	*get_cmd_path(char **env_path, char *cmd)
 {
 	int		idx;
 	int		end;
@@ -26,41 +26,78 @@ char	*get_path_of_command(char **env_path, char *cmd)
 
 int	is_builtin_command(t_info *info)
 {
-	char	**cmd;
+	char	*cmd;
 	int		cmd_len;
 
-	//cmd = info->cmds[info->cmd_sequence].cmd;
-	cmd_len = ft_strlen(cmd[0]);
-	if (!ft_strncmp(cmd[0], "cd", cmd_len))
-		return (TRUE);
-	else if (!ft_strncmp(cmd[0], "pwd", cmd_len))
-		return (TRUE);
-	else if (!ft_strncmp(cmd[0], "export", cmd_len))
-		return (TRUE);
-	else if (!ft_strncmp(cmd[0], "unset", cmd_len))
-		return (TRUE);
-	else if (!ft_strncmp(cmd[0], "env", cmd_len))
-		return (TRUE);
-	else if (!ft_strncmp(cmd[0], "exit", cmd_len))
+	cmd = info->cmd_lst[info->cmd_sequence].text->str;
+	cmd_len = ft_strlen(cmd);
+	if (!ft_strncmp(cmd, "cd", cmd_len)
+		|| !ft_strncmp(cmd, "pwd", cmd_len)
+		|| !ft_strncmp(cmd, "export", cmd_len)
+		|| !ft_strncmp(cmd, "unset", cmd_len)
+		|| !ft_strncmp(cmd, "env", cmd_len)
+		|| !ft_strncmp(cmd, "exit", cmd_len))
 		return (TRUE);
 	return (FALSE);
 }
 
+void	malloc_cmd_list(t_info *info, char ***cmd_list)
+{
+	int		cnt;
+	t_lst	*cur;
+	t_lst	*next;
+
+	cnt = 0;
+	cur = info->cmd_lst[info->cmd_sequence].text;
+	while (cur != NULL)
+	{
+		next = cur->next;
+		cur = next;
+		cnt++;
+	}
+	*cmd_list = (char **)malloc(sizeof(char *) * cnt + 1);
+}
+
+char	**get_cmd_list(t_info *info)
+{
+	int		cnt;
+	t_lst	*cur;
+	t_lst	*next;
+	char	**cmd_list;
+
+	cnt = 0;
+	malloc_cmd_list(info, &cmd_list);
+	merror(cmd_list);
+	cur = info->cmd_lst[info->cmd_sequence].text;
+	while (cur != NULL)
+	{
+		if (*cur->str == 0)
+			break;
+		cmd_list[cnt] = cur->str;
+		next = cur->next;
+		cur = next;
+		cnt++;
+	}
+	cmd_list[cnt] = NULL;
+	return (cmd_list);
+}
+
 void	execute_execve_function(t_info *info, int depth)
 {
-	char	*path_of_cmd;
 	int		fd[2];
+	char	*cmd_path;
+	char	**cmd_list;
 
 	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
 	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
-//	path_of_cmd
-//		= get_path_of_command(info->env_path, info->cmds[depth].cmd[0]);
+	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
+	cmd_list = get_cmd_list(info);
 	switch_stdio(info, fd[READ], fd[WRITE]);
 	if (is_builtin_command(info))
 	{
-		builtin(info, fd);
-		if (info->n_cmd > 1)
-			exit(1);
+		// builtin(info, fd);
+		// if (info->n_cmd > 1)
+			// exit(EXIT_SUCCESS);
 		/*execve()는 알아서 프로세스가 교체되지만 builtin함수는 직접 exit을 해줘야한다. 안그러면 무한반복
 		커맨드가 하나 일 때는 부모에서 실행되기 때문에 exit되면 안됨*/
 
@@ -69,6 +106,9 @@ void	execute_execve_function(t_info *info, int depth)
 	// { 빌트인이나 리다이렉션이 아니면 자식 프로세스 만들어서 작업
 	// 	execute_redirection(info);
 	// }
-//	else
-//		execve(path_of_cmd, info->cmds[depth].cmd, info->env_list);
+	else
+	{
+		execve(path_of_cmd, cmd_list, info->env_list);
+		error();
+	}
 }
