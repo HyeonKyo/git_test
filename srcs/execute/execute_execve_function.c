@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char	*get_path_of_command(char **env_path, char *cmd)
+char	*get_cmd_path(char **env_path, char *cmd)
 {
 	int		idx;
 	int		end;
@@ -58,7 +58,7 @@ void	malloc_cmd_list(t_info *info, char ***cmd_list)
 	*cmd_list = (char **)malloc(sizeof(char *) * cnt + 1);
 }
 
-char	**set_cmd_list(t_info *info)
+char	**get_cmd_list(t_info *info)
 {
 	int		cnt;
 	t_lst	*cur;
@@ -84,15 +84,14 @@ char	**set_cmd_list(t_info *info)
 
 void	execute_execve_function(t_info *info, int depth)
 {
-	char	*path_of_cmd;
-	char	**cmd_list;
 	int		fd[2];
+	char	*cmd_path;
+	char	**cmd_list;
 
 	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
 	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
-	path_of_cmd
-		= get_path_of_command(info->env_path, info->cmd_lst[depth].text->str);
-	cmd_list = set_cmd_list(info);
+	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
+	cmd_list = get_cmd_list(info);
 	switch_stdio(info, fd[READ], fd[WRITE]);
 	if (is_builtin_command(info))
 	{
