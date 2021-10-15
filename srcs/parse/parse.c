@@ -190,7 +190,10 @@ void	replace_env_value(char **origin, int *i, t_info *info)
 	type = check_type((*origin)[*i]);
 	key_len = 1;
 	while (type == NORM)
+	{
+		type = check_type((*origin)[*i + key_len]);
 		key_len++;
+	}
 	env_key = (char *)malloc(sizeof(char) * key_len);
 	merror(env_key);
 	ft_strlcpy(env_key, (*origin + *i), key_len);//"aa$"같은 경우 테스트 해보기
@@ -203,6 +206,7 @@ void	replace_env_value(char **origin, int *i, t_info *info)
 	merror(rest_str);
 	new = ft_strjoin(front_str, env_value);
 	free(*origin);
+	*i -= 1;
 	*origin = ft_strjoin(new, rest_str);
 	free(front_str);
 	free(env_value);
@@ -255,19 +259,26 @@ char	*fillin_buf(char *buf, char *origin, t_info *info)
 			i++;
 			if (type == SQUOTE)
 			{
-				while (check_type(origin[i]) != SQUOTE && origin[i])
+				type = check_type(origin[i]);
+				while (type != SQUOTE && origin[i])
+				{
 					buf[j++] = origin[i++];
+					type = check_type(origin[i]);
+				}
 			}
 			else
 			{
-				while (check_type(origin[i]) != DQUOTE && origin[i])
+				type = check_type(origin[i]);
+				while (type != DQUOTE && origin[i])
 				{
 					if (type == DOLR)
 					{
 						replace_env_value(&origin, &i, info);
+						type = check_type(origin[i]);
 						continue ;
 					}
 					buf[j++] = origin[i++];
+					type = check_type(origin[i]);
 				}
 			}
 			i++;
