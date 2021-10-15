@@ -425,11 +425,14 @@ int	count_command(char *line)
 	{
 		while (sep_idx && check_type(line[sep_idx]) != PIPE)
 		{
+			sep_idx++;
 			sep_idx = find_separator(line, sep_idx);
-			if (sep_idx != 0)
-				sep_idx++;
 		}
+		if (!sep_idx)
+			break ;
 		sep_cnt++;
+		sep_idx++;
+		sep_idx = find_separator(line, sep_idx);
 	}
 	return (sep_cnt + 1);
 }
@@ -448,17 +451,17 @@ char	**divide_by_command(char *line, t_info *info)
 	ft_memset(cmd, 0, sizeof(char *) * (info->n_cmd + 1));
 	i = 0;
 	pre_idx = 0;
-	cur_idx = 1;
+	cur_idx = find_separator(line, pre_idx);
 	while (i < info->n_cmd)
 	{
 		while (check_type(line[cur_idx]) != PIPE && cur_idx)
-			cur_idx = find_separator(line, cur_idx);
+			cur_idx = find_separator(line, ++cur_idx);
 		if (cur_idx == 0)
 			cur_idx = (int)ft_strlen(line);
 		cmd[i] = (char *)malloc(sizeof(char) * (cur_idx - pre_idx + 1));
 		merror(cmd[i]);
 		ft_strlcpy(cmd[i], line + pre_idx, cur_idx - pre_idx + 1);
-		pre_idx = cur_idx + 1;
+		pre_idx = ++cur_idx;
 		i++;
 	}
 	free(line);
@@ -508,8 +511,8 @@ int	find_quote_idx(char *cmd, int *idx)
 			return (FALSE);
 		}
 		(*idx)++;
-
 	}
+	return (FALSE);
 }
 
 char	**quote_split(char *cmd)
@@ -522,11 +525,14 @@ char	**quote_split(char *cmd)
 	t_quote	data;
 
 	init_quote_data(&data);
-	str_cnt = 1;
+	str_cnt = 0;
 	i = 0;
 	//make_cmd_lst
 	while (find_quote_idx(cmd, &i))
+	{
 		str_cnt++;
+		i++;
+	}
 	cmd_lst = (char **)malloc(sizeof(char *) * (str_cnt + 1));
 	merror(cmd_lst);
 	cmd_lst[str_cnt] = NULL;
@@ -537,9 +543,12 @@ char	**quote_split(char *cmd)
 	while (i < str_cnt)
 	{
 		find_quote_idx(cmd, &quote_idx);
-		cmd_lst[i] = (char *)malloc(sizeof(char) * (quote_idx + 1));
+		cmd_lst[i] = (char *)malloc(sizeof(char) * quote_idx - pre_idx);
 		merror(cmd_lst[i]);
-		ft_strlcpy(cmd_lst[i], cmd + quote_idx, quote_idx - pre_idx + 1);
+		if ((cmd[quote_idx] == '\"' && cmd[pre_idx] != '\"')
+			|| (cmd[quote_idx] == '\'' && cmd[pre_idx] != '\''))
+			pre_idx--;
+		ft_strlcpy(cmd_lst[i], cmd + pre_idx + 1, quote_idx - pre_idx);
 		pre_idx = ++quote_idx;
 		i++;
 	}
