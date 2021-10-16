@@ -73,8 +73,8 @@ char	**get_cmd_list(t_info *info)
 	{
 		if (*cur->str == 0)
 			break;
-		cmd_list[cnt] = cur->str;
-		next = cur->next;
+		cmd_list[cnt] = cur->str;//** 현교: info->cmd_lst의 문자들을 다른 곳에서 다시 사용한다면 ft_strdup로 복사해서 넣어주는 게 좋을 듯? 
+		next = cur->next;		// -> 아래 2줄은 cur = cur->next;로 변경하면 안되는지?
 		cur = next;
 		cnt++;
 	}
@@ -88,6 +88,7 @@ void	execute_execve_function(t_info *info, int depth)
 	char	*cmd_path;
 	char	**cmd_list;
 
+	//** 현교 : 리다이렉션 판별 로직이 여기 들어가야하는지? **
 	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
 	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
@@ -95,9 +96,9 @@ void	execute_execve_function(t_info *info, int depth)
 	switch_stdio(info, fd[READ], fd[WRITE]);
 	if (is_builtin_command(info))
 	{
-		// builtin(info, fd);
-		// if (info->n_cmd > 1)
-			// exit(EXIT_SUCCESS);
+		builtin(cmd_list, info, fd);
+		if (info->n_cmd > 1)
+			exit(EXIT_SUCCESS);
 		/*execve()는 알아서 프로세스가 교체되지만 builtin함수는 직접 exit을 해줘야한다. 안그러면 무한반복
 		커맨드가 하나 일 때는 부모에서 실행되기 때문에 exit되면 안됨*/
 
@@ -108,7 +109,7 @@ void	execute_execve_function(t_info *info, int depth)
 	// }
 	else
 	{
-		execve(path_of_cmd, cmd_list, info->env_list);
+		execve(cmd_path, cmd_list, info->env_list);
 		error();
 	}
 }

@@ -6,6 +6,14 @@
 ** =============================================================================
 */
 
+
+int	is_spacial(char c)
+{
+	if (c <= 47 || (c >= 58 && c <= 64) || (c <= 91 && c >= 96) || c >= 123)
+		return (TRUE);
+	return (FALSE);
+}
+
 int	is_space(char c)
 {
 	if (c == ' ' || (c >= 9 && c <= 13))
@@ -47,8 +55,11 @@ t_type	check_type(char c)
 	return (NORM);
 }
 
-int	is_separator(t_type type)
+int	is_separator(char c)
 {
+	t_type	type;
+
+	type = check_type(c);
 	if (type == SPCE || type == PIPE || type == END
 		|| type == RRDI || type == LRDI)
 		return (TRUE);
@@ -336,8 +347,8 @@ char	*clear_quote(char *line, int *start_idx, int sep_idx, t_info *info)
 
 char	*remove_space(char *line, int start_idx)
 {
-	int	i;
-	int	space_len;
+	int		i;
+	int		space_len;
 	char	*front;
 	char	*back;
 	char	*new;
@@ -364,13 +375,12 @@ void	skip_separator_not_space(char *line, int *i)
 {
 	t_type	type;
 
-	type = check_type(line[*i]);
-	while (is_separator(type))
+	while (is_separator(line[*i]))
 	{
+		type = check_type(line[*i]);
 		if (type == SPCE || type == END)
 			return ;
 		(*i)++;
-		type = check_type(line[*i]);
 	}
 }
 
@@ -384,13 +394,11 @@ char	*skip_space(char *line, int *start_idx)
 	new = ft_strdup(line);
 	merror(new);
 	free(line);
-	type = check_type(new[i]);
-	while (is_separator(type))
+	while (is_separator(new[i]))
 	{
 		new = remove_space(new, i);
 		skip_separator_not_space(new, &i);
-		type = check_type(new[i]);
-		if (type == END)
+		if (new[i] == 0)
 			break ;
 	}
 	*start_idx = i;
@@ -456,7 +464,6 @@ char	**divide_by_command(char *line, t_info *info)
 	char	**cmd;
 
 	info->n_cmd = count_command(line);
-	info->n_pipe = info->n_cmd;//나중에 개수 조절해줌.
 	cmd = (char **)malloc(sizeof(char *) * (info->n_cmd + 1));
 	merror(cmd);
 	ft_memset(cmd, 0, sizeof(char *) * (info->n_cmd + 1));
@@ -466,7 +473,11 @@ char	**divide_by_command(char *line, t_info *info)
 	while (i < info->n_cmd)
 	{
 		while (check_type(line[cur_idx]) != PIPE && cur_idx)
-			cur_idx = find_separator(line, ++cur_idx);
+		{
+			if (pre_idx != cur_idx || is_separator(line[cur_idx]))
+				cur_idx++;
+			cur_idx = find_separator(line, cur_idx);
+		}
 		if (cur_idx == 0)
 			cur_idx = (int)ft_strlen(line);
 		cmd[i] = (char *)malloc(sizeof(char) * (cur_idx - pre_idx + 1));
@@ -477,6 +488,16 @@ char	**divide_by_command(char *line, t_info *info)
 	}
 	free(line);
 	return (cmd);
+}
+
+void	count_pipeline(char *cmd, t_info *info)
+{
+	int	i;
+
+	i = 0;
+	while (cmd[i] != NULL)
+		i++;
+	info->n_pipe = i - 1;
 }
 
 int	check_redirection(char *cmd)
@@ -548,6 +569,7 @@ char	**quote_split(char *cmd)
 	merror(cmd_lst);
 	cmd_lst[str_cnt] = NULL;
 	//--
+	// >>"텍스트" -> 처음부터 뒤의 "인덱스까지 파싱하기 때문에
 	i = 0;
 	quote_idx = 0;
 	pre_idx = 0;
@@ -560,6 +582,7 @@ char	**quote_split(char *cmd)
 			|| (cmd[quote_idx] == '\'' && cmd[pre_idx] != '\''))
 			pre_idx--;
 		ft_strlcpy(cmd_lst[i], cmd + pre_idx + 1, quote_idx - pre_idx);
+		//cmd_lst[i] = replace_quote_by_space(cmd_lst[i]);
 		pre_idx = ++quote_idx;
 		i++;
 	}
@@ -616,6 +639,7 @@ void	make_command(char *line, t_info *info)
 	char	**cmd;
 
 	cmd = divide_by_command(line, info);
+	count_pipeline(cmd, info);
 	make_command_array(cmd, info);
 }
 

@@ -55,9 +55,19 @@ typedef enum e_type
 	SQUOTE, DQUOTE,
 	SPCE, SPEC, DOLR, PIPE, END,
 	RRDI, LRDI, DRRDI, DLRDI
-
 }			t_type;
 
+/*
+** =============================================================================
+** Union type Definition
+** =============================================================================
+*/
+
+typedef union u_exit
+{
+	int				num;
+	unsigned char	c[4];
+}			t_exit;
 
 /*
 ** =============================================================================
@@ -109,7 +119,7 @@ typedef struct s_info
 
 /*
 ** =============================================================================
-** Struct type Definition
+** FILES
 ** =============================================================================
 */
 
@@ -130,8 +140,9 @@ void	free_two_dimensional(char **two_dimensional);
 char	*make_cursor_string(void);
 
 //builtin
-int		cd(char *path);
+int		cd(char *path, t_info *info);
 int		pwd(int *fd);
+void	execute_exit(char **cmd);
 
 int		check_listin(char *env_key, t_info *info);
 char	*get_env_value(char *env_key, t_info *info);
@@ -142,22 +153,25 @@ void	unset(char **cmd, t_info *info);
 
 void	env(t_info *info, int *fd);
 
-int		error(void);
-void	merror(void *addr);
-
 void	save_env_values(t_info *info, char **envp);
 
 void	sig_handler(int signo);
 
-int		builtin(t_info *info, int *fd);
+int		builtin(char **cmd, t_info *info, int *fd);
 
 void	free_double_string(char **list);
 
 //parsing
+int		is_spacial(char c);
 int		parse_line(char *line, t_info *info);
 
 //list.c
 t_lst	*create_node(void);
 void	link_node(char *cmd, t_lst **list);
+
+//error
+int		error(void);
+void	merror(void *addr);
+void	error_message(char *cmd, char *msg);
 
 #endif

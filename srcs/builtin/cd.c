@@ -1,7 +1,16 @@
 #include "minishell.h"
 
-int	cd(char *path)
+int	cd(char *path, t_info *info)
 {
+	char	*home;
+
+	if (path == NULL)
+	{
+		home = get_env_value("HOME", info);
+		chdir(home);
+		free(home);
+		return (NORMAL);
+	}
 	if (chdir(path) == -1)
 		return (ERROR);
 	return (NORMAL);

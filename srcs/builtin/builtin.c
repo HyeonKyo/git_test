@@ -1,14 +1,12 @@
 #include "minishell.h"
 
-int	builtin(t_info *info, int *fd)
+int	builtin(char **cmd, t_info *info, int *fd)
 {
-	char	**cmd;
-	int		cmd_len;
+	int	cmd_len;
 
-	// cmd = info->cmds[info->cmd_sequence].cmd;
 	cmd_len = ft_strlen(cmd[0]);
 	if (!ft_strncmp(cmd[0], "cd", cmd_len))
-		cd(cmd[1]);
+		cd(cmd[1], info);
 	else if (!ft_strncmp(cmd[0], "pwd", cmd_len))
 		pwd(fd);
 	else if (!ft_strncmp(cmd[0], "export", cmd_len))
@@ -18,7 +16,7 @@ int	builtin(t_info *info, int *fd)
 	else if (!ft_strncmp(cmd[0], "env", cmd_len))
 		env(info, fd);
 	else if (!ft_strncmp(cmd[0], "exit", cmd_len))
-		exit(0);
+			execute_exit(cmd);
 	else
 	{
 		free_double_string(cmd);

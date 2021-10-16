@@ -45,6 +45,7 @@ OBJS_LST	=	main.o						\
 				builtin.o					\
 				cd.o						\
 				env.o						\
+				exit.o						\
 				export.o					\
 				free.o						\
 				pwd.o						\

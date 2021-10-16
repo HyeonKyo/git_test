@@ -17,7 +17,7 @@ void	execute_command(t_info *info, int depth)
 			{
 				;
 			}
-			return ;
+			return ;//현교comment : 여기서 status값을 리턴?
 		}
 		execute_command(info, depth + 1);//부모에서 execute_command() 함수 재귀 호출
 	}
