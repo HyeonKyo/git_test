@@ -4,7 +4,7 @@ int	builtin(char **cmd, t_info *info, int *fd)
 {
 	int	cmd_len;
 
-	cmd_len = ft_strlen(cmd[0]);
+	cmd_len = ft_strlen(cmd[0]) + 1;
 	if (!ft_strncmp(cmd[0], "cd", cmd_len))
 		cd(cmd[1], info);
 	else if (!ft_strncmp(cmd[0], "pwd", cmd_len))

@@ -29,12 +29,12 @@ void	execute_exit(char **cmd)
 			//g_exit_code = tmp.c[3];
 			exit(0);//exit안의 값 exitcode로 변경해주어야함.
 		}
-		error_message(cmd[0], "too many arguments");
+		error_message(cmd[0], NULL, "too many arguments");
 		return ;
 	}
 	else
 	{
-		error_message(cmd[1], "numeric argument required");
+		error_message("exit", cmd[1], "numeric argument required");
 		exit(255);
 	}
 }

@@ -30,12 +30,21 @@ void	del_env_value(int idx, t_info *info)
 
 void	unset(char **cmd, t_info *info)
 {
-	int		idx;
-	char	*value;
+	int		i;
+	int		env_idx;
+	char	*key;
 
-	value = cmd[1];
-	idx = check_listin(value, info);
-	if (idx >= 0)
-		del_env_value(idx, info);
+	i = 0;
+	while (cmd[++i] != NULL)
+	{
+		key = cmd[i];
+		if (incorrect_env_key(key))
+		{
+			error_message(cmd[0], key, "not a valid identifier");
+			continue ;
+		}
+		env_idx = check_listin(key, info);
+		if (env_idx >= 0)
+			del_env_value(env_idx, info);
+	}
 }
-

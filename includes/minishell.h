@@ -131,6 +131,7 @@ void	execute_execve_function(t_info *info, int depth);
 int		get_fd_will_be_stdin(t_info *info, int depth, int is_redirection);
 int		get_fd_will_be_stdout(t_info *info, int depth, int is_redirection);
 void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
+int		is_builtin_command(t_info *info);
 
 void	make_pipeline(t_info *info);
 void	close_pipeline(t_info *info);
@@ -146,6 +147,7 @@ int		cd(char *path, t_info *info);
 int		pwd(int *fd);
 void	execute_exit(char **cmd);
 
+int		incorrect_env_key(char *env_key);
 int		check_listin(char *env_key, t_info *info);
 char	*get_env_value(char *env_key, t_info *info);
 int		get_env_list_size(char **env_list);
@@ -174,6 +176,6 @@ void	link_node(char *cmd, t_lst **list);
 //error
 int		error(void);
 void	merror(void *addr);
-void	error_message(char *cmd, char *msg);
+void	error_message(char *cmd, char *arg, char *msg);
 
 #endif

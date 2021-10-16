@@ -21,10 +21,18 @@ void	merror(void *addr)
 	}
 }
 
-void	error_message(char *cmd, char *msg)
+void	error_message(char *cmd, char *arg, char *msg)
 {
 	ft_putstr_fd("Minishell: ", STDERR_FILENO);
-	ft_putstr_fd(cmd, STDERR_FILENO);
-	ft_putstr_fd(": ", STDERR_FILENO);
+	if (cmd)
+	{
+		ft_putstr_fd(cmd, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+	}
+	if (arg)
+	{
+		ft_putstr_fd(arg, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+	}
 	ft_putendl_fd(msg, STDERR_FILENO);
 }

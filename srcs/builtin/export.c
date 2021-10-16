@@ -91,33 +91,44 @@ int	incorrect_env_key(char *env_key)
 	int	i;
 
 	i = 0;
+	if (ft_isdigit(env_key[i]))
+		return (TRUE);
 	while (env_key[i] && !is_spacial(env_key[i]))
 		i++;
 	if (env_key[i] == 0)
 		return (FALSE);
 	return (TRUE);
+	//특수문자 말고 확인할거 있는지 체크하기
+	// + 첫글자가 숫자인지도 체크
+}
+
+int	check_add_value(char **env)
+{
+	int	len;
+
+	len = (int)ft_strlen(env[0]);
+	//if (env[0][len - 1] == '+')
 }
 
 void	export(char **cmd, t_info *info)
 {
 	int		i;
 	int		env_idx;
+	int		add_flag;
 	char	**env;
 
 	i = 0;
+	add_flag = FALSE;
 	while (cmd[++i] != NULL)
 	{
-		env = ft_split(cmd[i], '=');
+		env = ft_split(cmd[i], '=');//==이 2개인 경우도 인식하는데 이거 처리 어떻게? => 무조건 첫번째 =으로 처리
 		merror(env);
+		if (check_add_value(env))
+			add_flag = TRUE;
 		if (incorrect_env_key(env[0]))
 		{
-			//에러메시지 출력
-			error_message(env[0], "not a valid identifier");
+			error_message("export", env[0], "not a valid identifier");
 			continue ;
-			/*
-				key값이 특수문자,숫자로 시작 시 not a valid identifier에러메시지 출력하고 실행안함.
-				인자 여러개 들어오면 각각 에러검사 후 아니면 넣어주고 에러면 메시지 출력
-			*/
 		}
 		env_idx = check_listin(env[0], info);
 		if (env_idx >= 0)
@@ -140,3 +151,4 @@ cmd[1] = QQ or QQ=asd
 	1. 환경변수 리스트 확장
 	2. QQ=~~그대로 추가.
 */
+// ++export qq+=asd -> value값에 이어붙이는 로직

@@ -4,7 +4,7 @@ int	cd(char *path, t_info *info)
 {
 	char	*home;
 
-	if (path == NULL)
+	if (path == NULL || (path[0] == '~' && path[1] == 0))
 	{
 		home = get_env_value("HOME", info);
 		chdir(home);
@@ -12,7 +12,10 @@ int	cd(char *path, t_info *info)
 		return (NORMAL);
 	}
 	if (chdir(path) == -1)
+	{
+		error_message("cd", path, "No such file or directory");
 		return (ERROR);
+	}
 	return (NORMAL);
 }
 
