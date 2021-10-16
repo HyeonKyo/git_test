@@ -91,6 +91,8 @@ void	execute_execve_function(t_info *info, int depth)
 	//** 현교 : 리다이렉션 판별 로직이 여기 들어가야하는지? **
 	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
 	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
+	if (redirection(info, fd))
+		error();
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
 	cmd_list = get_cmd_list(info);
 	switch_stdio(info, fd[READ], fd[WRITE]);

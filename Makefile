@@ -57,6 +57,7 @@ OBJS_LST	=	main.o						\
 				get_fd_will_be_stdio.o		\
 				make_pipeline.o				\
 				switch_stdio.o				\
+				redirection.o				\
 				free_two_dimensional.o		\
 				parse.o						\
 				signal.o					\
