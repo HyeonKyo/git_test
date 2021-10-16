@@ -35,6 +35,9 @@
 # define READ 0
 # define WRITE 1
 
+#define KEY 0
+#define VALUE 1
+
 # define FRONT 0
 # define MID 1
 # define BACK 2
@@ -168,6 +171,12 @@ void	free_double_string(char **list);
 //parsing
 int		is_spacial(char c);
 int		parse_line(char *line, t_info *info);
+
+//env_list, utils
+char	**env_split(char *str);
+
+
+
 
 //list.c
 t_lst	*create_node(void);
