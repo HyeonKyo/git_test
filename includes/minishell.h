@@ -113,9 +113,11 @@ typedef struct s_info
 ** =============================================================================
 */
 
+//execute
 void	execute_command_main(t_info *info);
 void	execute_command(t_info *info, int depth);
 void	execute_execve_function(t_info *info, int depth);
+
 int		get_fd_will_be_stdin(t_info *info, int depth, int is_redirection);
 int		get_fd_will_be_stdout(t_info *info, int depth, int is_redirection);
 void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
@@ -123,11 +125,11 @@ void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
 void	make_pipeline(t_info *info);
 void	close_pipeline(t_info *info);
 
-int		is_builtin_command(t_info *info);
+//redirection
+int		redirection(t_info *info, int fd[]);
 
+//free
 void	free_two_dimensional(char **two_dimensional);
-
-char	*make_cursor_string(void);
 
 //builtin
 int		cd(char *path);

@@ -90,6 +90,8 @@ void	execute_execve_function(t_info *info, int depth)
 
 	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
 	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
+	if (redirection(info, fd))
+		error();
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
 	cmd_list = get_cmd_list(info);
 	switch_stdio(info, fd[READ], fd[WRITE]);
@@ -108,7 +110,7 @@ void	execute_execve_function(t_info *info, int depth)
 	// }
 	else
 	{
-		execve(path_of_cmd, cmd_list, info->env_list);
+		execve(cmd_path, cmd_list, info->env_list);
 		error();
 	}
 }
