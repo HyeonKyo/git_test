@@ -54,7 +54,7 @@ OBJS_LST	=	main.o						\
 				close_pipeline.o			\
 				execute_execve_function.o	\
 				execute_shell_command.o		\
-				get_fd_will_be_stdio.o		\
+				get_pipe_fd.o				\
 				make_pipeline.o				\
 				switch_stdio.o				\
 				redirection.o				\

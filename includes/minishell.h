@@ -43,8 +43,9 @@
 # define BACK 2
 
 # define BUF_SIZE 20000
-
 # define ISODD 1
+
+# define MAX_FD 256
 
 /*
 ** =============================================================================
@@ -131,10 +132,8 @@ void	execute_command_main(t_info *info);
 void	execute_command(t_info *info, int depth);
 void	execute_execve_function(t_info *info, int depth);
 
-int		get_fd_will_be_stdin(t_info *info, int depth, int is_redirection);
-int		get_fd_will_be_stdout(t_info *info, int depth, int is_redirection);
+void	get_pipe_fd(t_info *info, int depth, int fd[]);
 void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
-int		is_builtin_command(t_info *info);
 
 void	make_pipeline(t_info *info);
 void	close_pipeline(t_info *info);
