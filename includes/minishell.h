@@ -131,8 +131,9 @@ typedef struct s_info
 	int			n_pipe;
 	char		*infile_name;
 	char		*outfile_name;
-	t_cmd		*cmd_lst;
+	char		*env_list;
 	t_env_deq	*env_deq;
+	t_cmd		*cmd_lst;
 	t_pipex 	pipex;
 }			t_info;
 
@@ -174,7 +175,8 @@ void	unset(char **cmd, t_info *info);
 
 void	env(t_info *info, int *fd);
 
-void	save_env_values(t_info *info, char **envp);
+void	save_env_variables(t_info *info, char **envp);
+void	make_env_double_string(t_info *info);
 
 void	sig_handler(int signo);
 

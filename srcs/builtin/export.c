@@ -128,6 +128,8 @@ void	export(char **cmd, t_info *info)
 			add_new_env(env, info);//변수 자체를 새로 추가 
 		free_double_string(env);
 		env = 0;
+		free_double_string(info->env_list);
+		make_env_double_string(info);
 	}
 }
 

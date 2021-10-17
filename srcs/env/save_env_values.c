@@ -1,6 +1,36 @@
 # include "minishell.h"
 
-void	save_env_values(t_info *info, char **envp)
+void	make_env_double_string(t_info *info)
+{
+	int		i;
+	char	*key;
+	char	*value;
+	char	*tmp;
+	t_env	*cur;
+
+	info->env_list = (char **)malloc(sizeof(char *) * (info->env_deq->size + 1));
+	merror(info->env_list);
+	i = 0;
+	cur = info->env_deq->head;
+	while (cur)
+	{
+		if (cur->env_flag == TRUE)
+		{
+			tmp = ft_strjoin(cur->key, "=");
+			merror(tmp);
+			info->env_list[i] = ft_strjoin(tmp, cur->value);
+			merror(info->env_list[i]);
+			free(tmp);
+			tmp = 0;
+			i++;
+		}
+		cur = cur->next;
+	}
+	info->env_list[i] = NULL;
+}
+
+
+void	save_env_variables(t_info *info, char **envp)
 {
 	int			size;
 	t_env		*new;
@@ -13,7 +43,7 @@ void	save_env_values(t_info *info, char **envp)
 	deq->head = new;
 	cur = new;
 	size = 0;
-	while (cur->next != NULL)
+	while (cur != NULL)
 	{
 		size++;
 		cur = cur->next;
@@ -21,4 +51,5 @@ void	save_env_values(t_info *info, char **envp)
 	deq->size = size;
 	deq->last = cur;
 	info->env_deq = deq;
+	make_env_double_string(info);
 }

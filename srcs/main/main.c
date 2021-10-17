@@ -70,7 +70,7 @@ int	main(int arc, char *arvg[], char *envp[])
 	t_info	info;
 
 	info.pipex.is_here_doc = 0;
-	save_env_values(&info, envp);
+	save_env_variables(&info, envp);
 	set_environment_path(&info);
 	signal(SIGINT, sig_handler);
 	signal(SIGQUIT, sig_handler);

@@ -53,15 +53,23 @@ int	is_register_variable(char *cmd)
 
 void	register_variable(char *cmd, t_info *info)
 {
+	int		flag;
 	char	*export_cmd[3];
+	char	**env;
 	t_env	*end;
 	t_env	*tmp;
 
+	flag = FALSE;
 	export_cmd[0] = "export";
 	export_cmd[1] = ft_strdup(cmd);
 	merror(export_cmd[1]);
 	export_cmd[2] = NULL;
+	env = env_split(cmd);
+	if (check_listin(env[KEY], info))
+		flag = TRUE;
+	free_double_string(env);
 	export(export_cmd, info);
-	info->env_deq->last->env_flag = FALSE;//만약 이미 있는 변수의 값만 바꾸ㅜㅠ는 경우는 끄면 안됨.
+	if (flag == FALSE)//이미 있는 변수의 값만 바꾸는 경우
+		info->env_deq->last->env_flag = FALSE;
 	free(export_cmd[1]);
 }
