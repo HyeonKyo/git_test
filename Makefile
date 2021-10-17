@@ -62,6 +62,8 @@ OBJS_LST	=	main.o						\
 				parse.o						\
 				signal.o					\
 				error.o						\
+				env_list.o					\
+				env_utils.o					\
 				list.o
 OBJS		=	$(addprefix $(OBJS_DIR), $(OBJS_LST))
 

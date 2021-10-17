@@ -79,6 +79,22 @@ typedef union u_exit
 ** =============================================================================
 */
 
+typedef struct s_env
+{
+	char			*key;
+	char			*value;
+	int				env_flag;
+	struct s_env	*next;
+	struct s_env	*prev;
+}			t_env;
+
+typedef struct s_env_deq
+{
+	int		size;
+	t_env	*head;
+	t_env	*last;
+}			t_env_deq;
+
 typedef struct s_pipex
 {
 	int		**pipe_fd;
@@ -95,7 +111,6 @@ typedef struct s_quote
 	int	dquote_cnt;
 }			t_quote;
 
-
 typedef struct s_lst
 {
 	char			*str;
@@ -110,15 +125,15 @@ typedef struct s_cmd
 
 typedef struct s_info
 {
-	char	**env_path;
-	char	**env_list;
-	t_cmd	*cmd_lst;
-	int		cmd_sequence;
-	int		n_cmd;
-	int		n_pipe;
-	char	*infile_name;
-	char	*outfile_name;
-	t_pipex pipex;
+	char		**env_path;
+	int			cmd_sequence;
+	int			n_cmd;
+	int			n_pipe;
+	char		*infile_name;
+	char		*outfile_name;
+	t_cmd		*cmd_lst;
+	t_env_deq	*env_deq;
+	t_pipex 	pipex;
 }			t_info;
 
 /*
@@ -131,6 +146,7 @@ typedef struct s_info
 void	execute_command_main(t_info *info);
 void	execute_command(t_info *info, int depth);
 void	execute_execve_function(t_info *info, int depth);
+int		is_builtin_command(t_info *info);
 
 void	get_pipe_fd(t_info *info, int depth, int fd[]);
 void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
@@ -149,10 +165,9 @@ int		cd(char *path, t_info *info);
 int		pwd(int *fd);
 void	execute_exit(char **cmd);
 
+//export
 int		incorrect_env_key(char *env_key);
-int		check_listin(char *env_key, t_info *info);
-char	*get_env_value(char *env_key, t_info *info);
-int		get_env_list_size(char **env_list);
+t_env	*check_listin(char *env_key, t_info *info);
 void	export(char **cmd, t_info *info);
 
 void	unset(char **cmd, t_info *info);
@@ -173,7 +188,13 @@ int		parse_line(char *line, t_info *info);
 
 //env_list, utils
 char	**env_split(char *str);
+char	*get_env_value(char *key, t_info *info);
 
+t_env	*create_env_node(void);
+void	link_env_node(t_env *front, t_env *back);
+t_env	*make_env_list(char **envp);
+int		is_register_variable(char *cmd);
+void	register_variable(char *cmd, t_info *info);
 
 
 

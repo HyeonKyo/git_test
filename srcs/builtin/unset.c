@@ -1,38 +1,23 @@
 # include "minishell.h"
 
-void	del_env_value(int idx, t_info *info)
+void	del_env_variable(t_env *cur, t_info *info)
 {
-	int		i;
-	int		j;
-	int		list_len;
-	char	**env_list;
-	char	**new;
+	t_env	*pre;
+	t_env	*next;
+	t_env	*del;
 
-	env_list = info->env_list;
-	list_len = get_env_list_size(env_list);
-	new = (char **)malloc(sizeof(char *) * list_len);
-	merror(new);
-	i = 0;
-	j = 0;
-	while (j < list_len)
-	{
-		if (j == idx)
-		{
-			j++;
-			continue ;
-		}
-		new[i++] = env_list[j++];
-	}
-	new[i] = NULL;
-	free_double_string(env_list);
-	info->env_list = new;
+	pre = cur->prev;
+	next = cur->next;
+	link_env_node(pre, next);
+	free(cur);
+	info->env_deq->size -= 1;
 }
 
 void	unset(char **cmd, t_info *info)
 {
 	int		i;
-	int		env_idx;
 	char	*key;
+	t_env	*cur;
 
 	i = 0;
 	while (cmd[++i] != NULL)
@@ -43,8 +28,8 @@ void	unset(char **cmd, t_info *info)
 			error_message(cmd[0], key, "not a valid identifier");
 			continue ;
 		}
-		env_idx = check_listin(key, info);
-		if (env_idx >= 0)
-			del_env_value(env_idx, info);
+		cur = check_listin(key, info);
+		if (cur)
+			del_env_variable(cur, info);
 	}
 }

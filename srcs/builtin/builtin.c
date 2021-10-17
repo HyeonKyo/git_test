@@ -17,6 +17,8 @@ int	builtin(char **cmd, t_info *info, int *fd)
 		env(info, fd);
 	else if (!ft_strncmp(cmd[0], "exit", cmd_len))
 			execute_exit(cmd);
+	else if (is_register_variable(cmd[0]))
+		register_variable(cmd[0], info);
 	else
 	{
 		free_double_string(cmd);

@@ -117,13 +117,6 @@ int	get_next_line(int fd, char **line)
 ** here_doc
 ** =============================================================================
 */
-int	here_doc(t_info *info, char *limiter, int fd[])
-{
-	fd[READ] = read_string_from_stdin(info, limiter);//파이프의 fd 리턴, 에러 시 -1 리턴
-	if (fd[READ] == -1)
-		return (ERROR);
-	return (NORMAL);
-}
 
 int	read_string_from_stdin(t_info *info, char *limiter)
 {
@@ -145,6 +138,14 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 	info->pipex.is_here_doc = 0;
 	close(pipe_fd[WRITE]);
 	return (pipe_fd[READ]);//문자열이 저장된 파이프의 fd를 반환
+}
+
+int	here_doc(t_info *info, char *limiter, int fd[])
+{
+	fd[READ] = read_string_from_stdin(info, limiter);//파이프의 fd 리턴, 에러 시 -1 리턴
+	if (fd[READ] == -1)
+		return (ERROR);
+	return (NORMAL);
 }
 /*=============================================================================*/
 

@@ -2,9 +2,17 @@
 
 void	env(t_info *info, int *fd)
 {
-	int	i;
+	t_env	*cur;
 
-	i = 0;
-	while (info->env_list[i] != NULL)
-		ft_putendl_fd(info->env_list[i++], fd[WRITE]);
+	cur = info->env_deq->head;
+	while (cur != NULL)
+	{
+		if (cur->env_flag == TRUE)
+		{
+			ft_putstr_fd(cur->key, fd[WRITE]);
+			ft_putstr_fd("=", fd[WRITE]);
+			ft_putendl_fd(cur->value, fd[WRITE]);
+		}
+		cur = cur->next;
+	}
 }

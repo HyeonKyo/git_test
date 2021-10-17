@@ -36,7 +36,8 @@ int	is_builtin_command(t_info *info)
 		|| !ft_strncmp(cmd, "export", cmd_len)
 		|| !ft_strncmp(cmd, "unset", cmd_len)
 		|| !ft_strncmp(cmd, "env", cmd_len)
-		|| !ft_strncmp(cmd, "exit", cmd_len))
+		|| !ft_strncmp(cmd, "exit", cmd_len)
+		|| is_register_variable(cmd))
 		return (TRUE);
 	return (FALSE);
 }
@@ -96,7 +97,7 @@ void	execute_execve_function(t_info *info, int depth)
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
 	cmd_list = get_cmd_list(info);
 	switch_stdio(info, fd[READ], fd[WRITE]);
-	if (is_builtin_command(info))
+	if (is_builtin_command(info))//**현교 : 이 if문 한 블록을 builtin함수 안에 넣어도 될듯?
 	{
 		builtin(cmd_list, info, fd);
 		if (info->n_cmd > 1)
@@ -106,7 +107,7 @@ void	execute_execve_function(t_info *info, int depth)
 	}
 	else
 	{
-		execve(cmd_path, cmd_list, info->env_list);
-		error();
+		execve(cmd_path, cmd_list, 0);//마지막 인자 = info->env_list, 컴파일 위해 바꿔놓음
+		error_message(cmd_list[0], NULL,"command not found");
 	}
 }

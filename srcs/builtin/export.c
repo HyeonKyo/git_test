@@ -1,89 +1,70 @@
 #include "minishell.h"
 
-int	check_listin(char *env_key, t_info *info)
+t_env	*check_listin(char *env_key, t_info *info)
 {
 	int	i;
 	int	len_value;
+	t_env	*cur;
 
-	len_value = (int)ft_strlen(env_key);
-	i = 0;
-	while (info->env_list[i] != NULL)
+	len_value = (int)ft_strlen(env_key) + 1;
+	cur = info->env_deq->head;
+	while (cur != NULL)
 	{
-		if (!ft_strncmp(env_key, info->env_list[i], len_value))
-		{
-			if (info->env_list[i][len_value] == '=')
-				return (i);
-		}
-		i++;
+		if (!ft_strncmp(env_key, cur->key, len_value))
+			return (cur);
+		cur = cur->next;
 	}
-	return (-1);
+	return (NULL);
 }
 
-int	get_env_list_size(char **env_list)
-{
-	int	list_len;
-
-	list_len = 0;
-	while (env_list[list_len++])
-		;
-	return (list_len);
-}
-
-int	make_new_list(t_info *info)
-{
-	int		i;
-	int		list_len;
-	char	**env_list;
-	char	**new;
-
-	env_list = info->env_list;
-	list_len = get_env_list_size(env_list);
-	new = (char **)malloc(sizeof(char *) * (list_len + 1));
-	merror(new);
-	i = -1;
-	while (++i < list_len)
-		new[i] = env_list[i];
-	new[i] = NULL;
-	free_double_string(env_list);
-	info->env_list = new;
-	return (list_len);
-}
-
-char	*get_env_value(char *env_key, t_info *info)
-{
-	int		env_idx;
-	char	**env;
-	char	*env_value;
-
-	env_idx = check_listin(env_key, info);
-	if (env_idx < 0)
-		return (NULL);
-	env = ft_split(info->env_list[env_idx], '=');
-	merror(env);
-	env_value = ft_strdup(env[1]);
-	free_double_string(env);
-	return (env_value);
-}
-
-void	add_env_value(int idx, char **env, t_info *info)
+void	add_env_value(char **env, t_env *cur, t_info *info, int add)
 {
 	char	*env_str;
+	char	*del;
+	char	*new;
 
-	if (env[1] == NULL)
+	if (env[VALUE][0] == '\0')
+	{
+		if (cur != NULL)
+			cur->env_flag = TRUE;
 		return ;
-	env_str = ft_strjoin(env[0], env[1]);
-	merror(env_str);
-	free(info->env_list[idx]);
-	info->env_list[idx] = env_str;
+	}
+	if (add == TRUE)
+	{
+		del = cur->value;
+		new = ft_strjoin(cur->value, env[VALUE]);
+		merror(new);
+		cur->value = new;
+		free(del);
+	}
+	else
+	{
+		if (cur->value)
+			free(cur->value);
+		cur->value = ft_strdup(env[VALUE]);
+		merror(cur->value);
+	}
+	cur->env_flag = TRUE;
 }
 
-void	add_new_env(char **cmd, t_info *info, int idx)
+void	add_new_env(char **env, t_info *info)
 {
-	int	list_len;
+	t_env	*end;
+	t_env	*tmp;
 
-	list_len = make_new_list(info);
-	info->env_list[--list_len] = ft_strdup((char *)cmd[idx]);
-	merror(info->env_list[--list_len]);
+	end = info->env_deq->last;
+	tmp = create_env_node();
+	link_env_node(end, tmp);
+	end = end->next;
+	end->key = ft_strdup(env[KEY]);
+	merror(end->key);
+	info->env_deq->last = end;
+	if (env[VALUE][0] == '\0')
+		return ;
+	end->value = ft_strdup(env[VALUE]);
+	merror(end->value);
+	end->env_flag = TRUE;
+	info->env_deq->size += 1;
 }
 
 int	incorrect_env_key(char *env_key)
@@ -104,37 +85,47 @@ int	incorrect_env_key(char *env_key)
 
 int	check_add_value(char **env)
 {
-	int	len;
+	int		len;
+	char	*tmp;
 
-	len = (int)ft_strlen(env[0]);
-	//if (env[0][len - 1] == '+')
+	len = (int)ft_strlen(env[KEY]);
+	if (env[KEY][len - 1] == '+')//맨뒤에 +가 있으면 그거 지워줌.
+	{
+		tmp = (char *)malloc(sizeof(char) * len);
+		merror(tmp);
+		ft_strlcpy(tmp, env[KEY], len);
+		free(env[KEY]);
+		env[KEY] = tmp;
+		return (TRUE);
+	}
+	return (FALSE);
 }
 
 void	export(char **cmd, t_info *info)
 {
 	int		i;
-	int		env_idx;
 	int		add_flag;
 	char	**env;
+	t_env	*cur_env;
 
 	i = 0;
 	add_flag = FALSE;
 	while (cmd[++i] != NULL)
 	{
-		env = ft_split(cmd[i], '=');//==이 2개인 경우도 인식하는데 이거 처리 어떻게? => 무조건 첫번째 =으로 처리
-		merror(env);
-		if (check_add_value(env))
-			add_flag = TRUE;
-		if (incorrect_env_key(env[0]))
+		env = env_split(cmd[i]);//==이 2개인 경우도 인식하는데 이거 처리 어떻게? => 무조건 첫번째 =으로 처리
+		add_flag = check_add_value(env);
+		if (incorrect_env_key(env[KEY]))//문자열의 양식 판단
 		{
-			error_message("export", env[0], "not a valid identifier");
+			error_message("export", env[KEY], "not a valid identifier");
+			free_double_string(env);
+			env = 0;
 			continue ;
 		}
-		env_idx = check_listin(env[0], info);
-		if (env_idx >= 0)
-			add_env_value(env_idx, env, info);
+		cur_env = check_listin(env[KEY], info);//리스트 안에 있는지
+		if (cur_env)
+			add_env_value(env, cur_env, info, add_flag);//그 변수 값을 새로이
 		else
-			add_new_env(cmd, info, i);
+			add_new_env(env, info);//변수 자체를 새로 추가 
 		free_double_string(env);
 		env = 0;
 	}

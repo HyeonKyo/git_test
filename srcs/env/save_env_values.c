@@ -2,19 +2,23 @@
 
 void	save_env_values(t_info *info, char **envp)
 {
-	int	i;
-	int	len;
+	int			size;
+	t_env		*new;
+	t_env		*cur;
+	t_env_deq	*deq;
 
-	len = 0;
-	while (envp[len++])
-		;
-	info->env_list = (char **)malloc(sizeof(char *) * len);
-	merror(info->env_list);
-	i = 0;
-	while (envp[i] != NULL)
+	new = make_env_list(envp);
+	deq = (t_env_deq *)malloc(sizeof(t_env_deq));
+	merror(deq);
+	deq->head = new;
+	cur = new;
+	size = 0;
+	while (cur->next != NULL)
 	{
-		info->env_list[i] = ft_strdup(envp[i]);
-		i++;
+		size++;
+		cur = cur->next;
 	}
-	info->env_list[i] = NULL;
+	deq->size = size;
+	deq->last = cur;
+	info->env_deq = deq;
 }
