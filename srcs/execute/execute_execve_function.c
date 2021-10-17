@@ -51,8 +51,7 @@ void	malloc_cmd_list(t_info *info, char ***cmd_list)
 	cur = info->cmd_lst[info->cmd_sequence].text;
 	while (cur != NULL)
 	{
-		next = cur->next;
-		cur = next;
+		cur = cur->next;
 		cnt++;
 	}
 	*cmd_list = (char **)malloc(sizeof(char *) * cnt + 1);
@@ -73,9 +72,8 @@ char	**get_cmd_list(t_info *info)
 	{
 		if (*cur->str == 0)
 			break;
-		cmd_list[cnt] = cur->str;//** 현교: info->cmd_lst의 문자들을 다른 곳에서 다시 사용한다면 ft_strdup로 복사해서 넣어주는 게 좋을 듯? 
-		next = cur->next;		// -> 아래 2줄은 cur = cur->next;로 변경하면 안되는지?
-		cur = next;
+		cmd_list[cnt] = ft_strdup(cur->str);
+		cur = cur->next;
 		cnt++;
 	}
 	cmd_list[cnt] = NULL;
@@ -88,9 +86,11 @@ void	execute_execve_function(t_info *info, int depth)
 	char	*cmd_path;
 	char	**cmd_list;
 
-	//** 현교 : 리다이렉션 판별 로직이 여기 들어가야하는지? **
-	fd[READ] = get_fd_will_be_stdin(info, depth, 0);
-	fd[WRITE] = get_fd_will_be_stdout(info, depth, 0);
+	/* cat file > a | wc -l 의 경우 cat의 출력이 파이프가 아니라 파일에 가기 때문에
+	파이프 fd를 먼저 받고 그 다음 리다이렉션 처리하는게 맞는 듯? 
+	리다이렉션을 먼저 처리하고 그 다음 파이프 fd를 받으면 최종 출력이 파일 아니라 파이프로 출력이 됨
+	*/
+	get_pipe_fd(info, depth, fd);
 	if (redirection(info, fd))
 		error();
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
@@ -103,12 +103,7 @@ void	execute_execve_function(t_info *info, int depth)
 			exit(EXIT_SUCCESS);
 		/*execve()는 알아서 프로세스가 교체되지만 builtin함수는 직접 exit을 해줘야한다. 안그러면 무한반복
 		커맨드가 하나 일 때는 부모에서 실행되기 때문에 exit되면 안됨*/
-
 	}
-	// else if (is_redirection_command(info))
-	// { 빌트인이나 리다이렉션이 아니면 자식 프로세스 만들어서 작업
-	// 	execute_redirection(info);
-	// }
 	else
 	{
 		execve(cmd_path, cmd_list, info->env_list);
