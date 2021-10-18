@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+extern int	g_exit_code;
+
 void	sigint_handler(void)
 {
 	ft_putchar_fd('\n', STDOUT_FILENO);
@@ -14,4 +16,10 @@ void	sig_handler(int signo)
 		sigint_handler();
 	else if (signo == SIGQUIT)
 		return ;
+}
+
+void	here_doc_handler(int signo)
+{
+	if (signo == SIGINT)
+		g_exit_code = -424242;
 }
