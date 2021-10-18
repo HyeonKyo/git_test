@@ -187,7 +187,7 @@ int		builtin(char **cmd, t_info *info, int *fd);
 void	free_double_string(char **list);
 
 //parsing
-int		is_spacial(char c);
+int		is_special(char c);
 int		parse_line(char *line, t_info *info);
 
 //env_list, utils

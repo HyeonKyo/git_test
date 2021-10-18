@@ -6,8 +6,7 @@
 ** =============================================================================
 */
 
-
-int	is_spacial(char c)
+int	is_special(char c)
 {
 	if (c <= 47 || (c >= 58 && c <= 64) || (c <= 91 && c >= 96) || c >= 123)
 		return (TRUE);
@@ -44,10 +43,8 @@ t_type	check_type(char c)
 		return (SPCE);
 	else if (c == '|')
 		return (PIPE);
-	// else if (is_special(c))
-	// 	return (SPEC);
-	else if (c == '$')
-		return (DOLR);
+	else if (is_special(c))
+		return (SPEC);
 	else if (c == '\0')
 		return (END);
 	else if (is_redirection(c))
@@ -282,7 +279,7 @@ char	*fillin_buf(char *buf, char *origin, t_info *info)
 				type = check_type(origin[i]);
 				while (type != DQUOTE && origin[i])
 				{
-					if (type == DOLR)
+					if (origin[i] == '$')
 					{
 						replace_env_value(&origin, &i, info);
 						type = check_type(origin[i]);

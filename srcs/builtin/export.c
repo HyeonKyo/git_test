@@ -74,7 +74,7 @@ int	incorrect_env_key(char *env_key)
 	i = 0;
 	if (ft_isdigit(env_key[i]))
 		return (TRUE);
-	while (env_key[i] && !is_spacial(env_key[i]))
+	while (env_key[i] && !is_special(env_key[i]))
 		i++;
 	if (env_key[i] == 0)
 		return (FALSE);
