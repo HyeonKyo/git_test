@@ -131,7 +131,7 @@ typedef struct s_info
 	int			n_pipe;
 	char		*infile_name;
 	char		*outfile_name;
-	char		*env_list;
+	char		**env_list;
 	t_env_deq	*env_deq;
 	t_cmd		*cmd_lst;
 	t_pipex 	pipex;

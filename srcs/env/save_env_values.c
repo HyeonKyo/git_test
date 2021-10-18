@@ -46,10 +46,11 @@ void	save_env_variables(t_info *info, char **envp)
 	while (cur != NULL)
 	{
 		size++;
+		if (cur->next == NULL)
+			deq->last = cur;
 		cur = cur->next;
 	}
 	deq->size = size;
-	deq->last = cur;
 	info->env_deq = deq;
 	make_env_double_string(info);
 }
