@@ -88,12 +88,12 @@ void	execute_execve_function(t_info *info, int depth)
 	char	**cmd_list;
 
 	/* cat file > a | wc -l 의 경우 cat의 출력이 파이프가 아니라 파일에 가기 때문에
-	파이프 fd를 먼저 받고 그 다음 리다이렉션 처리하는게 맞는 듯? 
+	파이프 fd를 먼저 받고 그 다음 리다이렉션 처리하는게 맞는 듯?
 	리다이렉션을 먼저 처리하고 그 다음 파이프 fd를 받으면 최종 출력이 파일 아니라 파이프로 출력이 됨
 	*/
 	get_pipe_fd(info, depth, fd);
 	if (redirection(info, fd))
-		error();
+		error();//비정상 종료 리턴
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
 	cmd_list = get_cmd_list(info);
 	if (!is_builtin_command(info) || !info->n_cmd == 1)
@@ -110,5 +110,7 @@ void	execute_execve_function(t_info *info, int depth)
 	{
 		execve(cmd_path, cmd_list, info->env_list);
 		error_message(cmd_list[0], NULL,"command not found");
+		exit(127);//127 나중에 디파인상수로
+		//비정상 종료 리턴
 	}
 }

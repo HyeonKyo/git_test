@@ -128,7 +128,7 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 	while (1)
 	{
 		info->pipex.is_here_doc = 1;
-		get_next_line(0, &str);//gnl 함수로 표준입력 받기
+		get_next_line(STDIN_FILENO, &str);//gnl 함수로 표준입력 받기
 		if (strncmp(str, limiter, ft_strlen(limiter)) == 0)//사용자가 limiter 입력하면 break
 			break ;
 		ft_putstr_fd(str, pipe_fd[WRITE]);//받은 문자열을 파이프에 저장

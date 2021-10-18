@@ -17,14 +17,15 @@ void	execute_command(t_info *info, int depth)
 			{
 				;
 			}
-			return ;//현교comment : status값을 exitcode에 넣어주기
+			printf("%d\n", WEXITSTATUS(status));
+			return ;//status값을 exitcode전역변수에 넣어주기
 		}
 		execute_command(info, depth + 1);//부모에서 execute_command() 함수 재귀 호출
 	}
 	if (info->pipex.pid[depth] == 0)
 	{
 		execute_execve_function(info, depth);
-		exit(EXIT_SUCCESS);
+		exit(EXIT_FAILURE);
 	}
 }
 
