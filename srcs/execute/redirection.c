@@ -1,5 +1,7 @@
 #include "minishell.h"
 
+extern int	g_exit_code;
+
 /*
 ** =============================================================================
 ** gnl
@@ -128,6 +130,8 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 	while (1)
 	{
 		info->pipex.is_here_doc = 1;
+		if (g_exit_code == -424242)
+			break ;
 		if (get_next_line(0, &str))//gnl 함수로 표준입력 받기
 		{
 			if (strncmp(str, limiter, ft_strlen(limiter)) == 0)//사용자가 limiter 입력하면 break
