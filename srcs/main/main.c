@@ -69,7 +69,7 @@ int	main(int arc, char *arvg[], char *envp[])
 	char	*line;
 	t_info	info;
 
-	info.pipex.is_here_doc = 0;
+	ft_memset(&info, 0, sizeof(t_info));
 	save_env_variables(&info, envp);
 	set_environment_path(&info);
 	signal(SIGINT, sig_handler);

@@ -142,10 +142,10 @@ int	find_separator(char *line, int idx)
 			dquote_flag ^= TRUE;
 		if (!squote_flag && !dquote_flag && (type == SPCE || type == PIPE
 			|| is_redirection(line[idx])))
-			return (idx);
+			break ;
 		idx++;
 	}
-	return (FALSE);
+	return (idx);
 }
 
 char	**divide_by_separator(char *line, int start_idx, int sep_idx)
@@ -329,8 +329,6 @@ char	*clear_quote(char *line, int *start_idx, int sep_idx, t_info *info)
 	char	*new;
 	char	**divide;
 
-	if (sep_idx == 0)
-		sep_idx = ft_strlen(line);
 	divide = divide_by_separator(line, *start_idx, sep_idx);
 	buf = make_buf();
 	new = fillin_buf(buf, divide[MID], info);
@@ -420,7 +418,7 @@ char	*pre_processing(char *line, t_info *info)
 	while (TRUE)
 	{
 		sep_idx = find_separator(new, start_idx);
-		if (start_idx && sep_idx == 0)
+		if (!new[sep_idx])//끝까지 다본 경우 뿐만 아니라 << EOF같은 경우도 있음.
 			end_flag = TRUE;
 		new = clear_quote(new, &start_idx, sep_idx, info);
 		if (new == NULL)
@@ -440,14 +438,14 @@ int	count_command(char *line)
 	sep_idx = 0;
 	sep_cnt = 0;
 	sep_idx = find_separator(line, sep_idx);
-	while (sep_idx)
+	while (line[sep_idx])
 	{
-		while (sep_idx && check_type(line[sep_idx]) != PIPE)
+		while (line[sep_idx] && check_type(line[sep_idx]) != PIPE)
 		{
 			sep_idx++;
 			sep_idx = find_separator(line, sep_idx);
 		}
-		if (!sep_idx)
+		if (!line[sep_idx])
 			break ;
 		sep_cnt++;
 		sep_idx++;
@@ -472,14 +470,12 @@ char	**divide_by_command(char *line, t_info *info)
 	cur_idx = find_separator(line, pre_idx);
 	while (i < info->n_cmd)
 	{
-		while (check_type(line[cur_idx]) != PIPE && cur_idx)
+		while (check_type(line[cur_idx]) != PIPE && line[cur_idx])
 		{
 			if (pre_idx != cur_idx || is_separator(line[cur_idx]))
 				cur_idx++;
 			cur_idx = find_separator(line, cur_idx);
 		}
-		if (cur_idx == 0)
-			cur_idx = (int)ft_strlen(line);
 		cmd[i] = (char *)malloc(sizeof(char) * (cur_idx - pre_idx + 1));
 		merror(cmd[i]);
 		ft_strlcpy(cmd[i], line + pre_idx, cur_idx - pre_idx + 1);
