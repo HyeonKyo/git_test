@@ -486,7 +486,7 @@ char	**divide_by_command(char *line, t_info *info)
 	return (cmd);
 }
 
-void	count_pipeline(char *cmd, t_info *info)
+void	count_pipeline(char **cmd, t_info *info)
 {
 	int	i;
 
