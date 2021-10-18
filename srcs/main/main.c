@@ -1,5 +1,7 @@
 # include "minishell.h"
 
+int	g_exit_code;
+
 static void	add_slash_at_end_of_path(t_info *info, char **environment_path)
 {
 	int		idx;
@@ -72,7 +74,10 @@ int	main(int arc, char *arvg[], char *envp[])
 	info.pipex.is_here_doc = 0;
 	save_env_variables(&info, envp);
 	set_environment_path(&info);
-	signal(SIGINT, sig_handler);
+	if (info.pipex.is_here_doc)
+		signal(SIGINT, here_doc_handler);
+	else
+		signal(SIGINT, sig_handler);
 	signal(SIGQUIT, sig_handler);
 	while (TRUE)
 	{
