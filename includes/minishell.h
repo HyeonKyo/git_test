@@ -209,4 +209,6 @@ int		error(void);
 void	merror(void *addr);
 void	error_message(char *cmd, char *arg, char *msg);
 
+int		get_next_line(int fd, char **line);
+
 #endif
