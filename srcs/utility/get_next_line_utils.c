@@ -26,18 +26,6 @@ void	ft_bzero(void *ptr, size_t size)
 	}
 }
 
-size_t	ft_strlen(const char *str)
-{
-	size_t	i;
-
-	i = 0;
-	if (str == 0)
-		return (0);
-	while (str[i])
-		i++;
-	return (i);
-}
-
 int		gnl_strmove(int fd, char **backup, char *src)
 {
 	char	*str;
