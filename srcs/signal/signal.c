@@ -20,6 +20,11 @@ void	sig_handler(int signo)
 
 void	here_doc_handler(int signo)
 {
+	char	c[2];
+
+	c[0] = '\n';
+	c[1] = 0;
 	if (signo == SIGINT)
-		g_exit_code = -424242;
+		write(0, &c, 2);
+	g_exit_code = -424242;
 }

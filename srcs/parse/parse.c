@@ -43,12 +43,12 @@ t_type	check_type(char c)
 		return (SPCE);
 	else if (c == '|')
 		return (PIPE);
-	else if (is_special(c))
-		return (SPEC);
 	else if (c == '\0')
 		return (END);
 	else if (is_redirection(c))
 		return (is_redirection(c));
+	else if (is_special(c))
+		return (SPEC);
 	return (NORM);
 }
 

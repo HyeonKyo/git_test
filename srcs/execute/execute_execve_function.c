@@ -31,6 +31,8 @@ int	is_builtin_command(t_info *info)
 
 	cmd = info->cmd_list[0];
 	cmd_len = ft_strlen(cmd);
+	if (cmd_len <= 0)
+		return (FALSE);
 	if (!ft_strncmp(cmd, "cd", cmd_len)
 		|| !ft_strncmp(cmd, "pwd", cmd_len)
 		|| !ft_strncmp(cmd, "export", cmd_len)

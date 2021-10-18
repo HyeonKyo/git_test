@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
+extern	g_exit_code;
 
 void	gnl_strcpy(char *dest, char *src, size_t size)
 {
@@ -99,7 +101,10 @@ int		get_next_line(int fd, char **line)
 		ft_bzero(buf, BUFFER_SIZE + 1);
 	}
 	if (n_bytes == 0)
+	{
+		printf("@@@flag1@@@\n");
 		return (gnl_get_one_line(fd, line, backup, buf));
+	}
 	else
 		return (clean(fd, buf, backup, -1));
 }

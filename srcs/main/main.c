@@ -72,12 +72,10 @@ int	main(int arc, char *arvg[], char *envp[])
 	t_info	info;
 
 	info.pipex.is_here_doc = 0;
+	g_exit_code = 0;
 	save_env_variables(&info, envp);
 	set_environment_path(&info);
-	if (info.pipex.is_here_doc)
-		signal(SIGINT, here_doc_handler);
-	else
-		signal(SIGINT, sig_handler);
+	signal(SIGINT, sig_handler);
 	signal(SIGQUIT, sig_handler);
 	while (TRUE)
 	{

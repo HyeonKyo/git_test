@@ -15,7 +15,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <limits.h>
-# define BUFFER_SIZE 2
+# define BUFFER_SIZE 10
 
 void	ft_bzero(void *ptr, size_t size);
 size_t	ft_strlen(const char *str);

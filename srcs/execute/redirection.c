@@ -129,9 +129,11 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 		return (-1);
 	while (1)
 	{
-		info->pipex.is_here_doc = 1;
 		if (g_exit_code == -424242)
+		{
+			printf("@@exit flag!@@\n");
 			break ;
+		}
 		if (get_next_line(0, &str))//gnl 함수로 표준입력 받기
 		{
 			if (strncmp(str, limiter, ft_strlen(limiter)) == 0)//사용자가 limiter 입력하면 break
@@ -144,12 +146,15 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 			break ;
 	}
 	info->pipex.is_here_doc = 0;
+	signal(SIGINT, sig_handler);
 	close(pipe_fd[WRITE]);
 	return (pipe_fd[READ]);//문자열이 저장된 파이프의 fd를 반환
 }
 
 int	here_doc(t_info *info, char *limiter, int fd[])
 {
+	info->pipex.is_here_doc = 1;
+	signal(SIGINT, here_doc_handler);
 	fd[READ] = read_string_from_stdin(info, limiter);//파이프의 fd 리턴, 에러 시 -1 리턴
 	if (fd[READ] == -1)
 		return (ERROR);
