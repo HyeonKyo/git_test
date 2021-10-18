@@ -56,7 +56,10 @@ void	execute_execve_function(t_info *info, int depth)
 		error();//비정상 종료 리턴
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
 	if (!is_builtin_command(info) || !(info->n_cmd == 1))
+	{
+		get_cmd_list(info);
 		switch_stdio(info, fd[READ], fd[WRITE]);
+	}
 	if (is_builtin_command(info))//**현교 : 이 if문 한 블록을 builtin함수 안에 넣어도 될듯?
 	{
 		builtin(info->cmd_list, info, fd);

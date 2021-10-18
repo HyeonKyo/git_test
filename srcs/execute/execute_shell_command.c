@@ -42,7 +42,7 @@ void	malloc_cmd_list(t_info *info)
 		cur = cur->next;
 		cnt++;
 	}
-	info->cmd_list = (char **)malloc(sizeof(char *) * cnt + 1);
+	info->cmd_list = (char **)malloc(sizeof(char *) * (cnt + 1));
 }
 
 void	get_cmd_list(t_info *info)
@@ -57,7 +57,7 @@ void	get_cmd_list(t_info *info)
 	cur = info->cmd_lst[info->cmd_sequence].text;
 	while (cur != NULL)
 	{
-		if (cur->str != NULL && cur->str[0] != NULL)
+		if (cur->str != NULL && cur->str[0] != '\0')
 		{
 			info->cmd_list[cnt] = ft_strdup(cur->str);
 			cnt++;
@@ -73,7 +73,7 @@ void	execute_command_main(t_info *info)
 	info->pipex.pid = (int *)malloc(sizeof(int) * info->n_cmd);
 	info->cmd_sequence = 0;
 	get_cmd_list(info);
-	if (is_builtin_command(info) && info->n_cmd == 1)
+	if (is_builtin_command(info) && (info->n_cmd == 1))
 	{
 		execute_execve_function(info, 0);
 		return ;

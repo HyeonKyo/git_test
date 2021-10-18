@@ -152,6 +152,7 @@ int		is_builtin_command(t_info *info);
 
 void	get_pipe_fd(t_info *info, int depth, int fd[]);
 void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
+void	get_cmd_list(t_info *info);
 
 void	make_pipeline(t_info *info);
 void	close_pipeline(t_info *info);
