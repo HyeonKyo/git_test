@@ -29,7 +29,7 @@ int	is_builtin_command(t_info *info)
 	char	*cmd;
 	int		cmd_len;
 
-	cmd = info->cmd_lst[info->cmd_sequence].text->str;
+	cmd = info->cmd_list[0];
 	cmd_len = ft_strlen(cmd);
 	if (!ft_strncmp(cmd, "cd", cmd_len)
 		|| !ft_strncmp(cmd, "pwd", cmd_len)
@@ -42,50 +42,10 @@ int	is_builtin_command(t_info *info)
 	return (FALSE);
 }
 
-void	malloc_cmd_list(t_info *info, char ***cmd_list)
-{
-	int		cnt;
-	t_lst	*cur;
-	t_lst	*next;
-
-	cnt = 0;
-	cur = info->cmd_lst[info->cmd_sequence].text;
-	while (cur != NULL)
-	{
-		cur = cur->next;
-		cnt++;
-	}
-	*cmd_list = (char **)malloc(sizeof(char *) * cnt + 1);
-}
-
-char	**get_cmd_list(t_info *info)
-{
-	int		cnt;
-	t_lst	*cur;
-	t_lst	*next;
-	char	**cmd_list;
-
-	cnt = 0;
-	malloc_cmd_list(info, &cmd_list);
-	merror(cmd_list);
-	cur = info->cmd_lst[info->cmd_sequence].text;
-	while (cur != NULL)
-	{
-		if (*cur->str == 0)
-			break;
-		cmd_list[cnt] = ft_strdup(cur->str);
-		cur = cur->next;
-		cnt++;
-	}
-	cmd_list[cnt] = NULL;
-	return (cmd_list);
-}
-
 void	execute_execve_function(t_info *info, int depth)
 {
 	int		fd[2];
 	char	*cmd_path;
-	char	**cmd_list;
 
 	/* cat file > a | wc -l 의 경우 cat의 출력이 파이프가 아니라 파일에 가기 때문에
 	파이프 fd를 먼저 받고 그 다음 리다이렉션 처리하는게 맞는 듯?
@@ -95,12 +55,11 @@ void	execute_execve_function(t_info *info, int depth)
 	if (redirection(info, fd))
 		error();//비정상 종료 리턴
 	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
-	cmd_list = get_cmd_list(info);
-	if (!is_builtin_command(info) || !info->n_cmd == 1)
+	if (!is_builtin_command(info) || !(info->n_cmd == 1))
 		switch_stdio(info, fd[READ], fd[WRITE]);
 	if (is_builtin_command(info))//**현교 : 이 if문 한 블록을 builtin함수 안에 넣어도 될듯?
 	{
-		builtin(cmd_list, info, fd);
+		builtin(info->cmd_list, info, fd);
 		if (info->n_cmd > 1)
 			exit(EXIT_SUCCESS);
 		/*execve()는 알아서 프로세스가 교체되지만 builtin함수는 직접 exit을 해줘야한다. 안그러면 무한반복
@@ -108,8 +67,8 @@ void	execute_execve_function(t_info *info, int depth)
 	}
 	else
 	{
-		execve(cmd_path, cmd_list, info->env_list);
-		error_message(cmd_list[0], NULL,"command not found");
+		execve(cmd_path, info->cmd_list, info->env_list);
+		error_message(info->cmd_list[0], NULL,"command not found");
 		exit(127);//127 나중에 디파인상수로
 		//비정상 종료 리턴
 	}

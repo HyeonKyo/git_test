@@ -126,6 +126,7 @@ typedef struct s_cmd
 typedef struct s_info
 {
 	char		**env_path;
+	char		**cmd_list;
 	int			cmd_sequence;
 	int			n_cmd;
 	int			n_pipe;

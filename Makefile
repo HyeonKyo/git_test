@@ -18,7 +18,7 @@ LINE_CLEAR	=	"\x1b[1A\x1b[M"
 # =============================================================================
 
 CC			=	gcc
-CFLAGS		=	-g -lreadline -L$(HOME)/.brew/opt/readline/lib -I$(HOME)/.brew/opt/readline/include
+CFLAGS		=	-g -fsanitize=address -lreadline -L$(HOME)/.brew/opt/readline/lib -I$(HOME)/.brew/opt/readline/include
 RM			=	rm -rf
 
 # =============================================================================
