@@ -16,6 +16,7 @@
 # include <stdlib.h>
 # include <limits.h>
 # define BUFFER_SIZE 10
+# define OPEN_MAX 256
 
 void	ft_bzero(void *ptr, size_t size);
 size_t	ft_strlen(const char *str);

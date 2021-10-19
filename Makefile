@@ -51,13 +51,15 @@ OBJS_LST	=	main.o						\
 				pwd.o						\
 				unset.o						\
 				save_env_values.o			\
-				close_pipeline.o			\
-				execute_execve_function.o	\
-				execute_shell_command.o		\
-				get_pipe_fd.o				\
+				execute_cmd.o				\
+				execute_execve.o			\
+				get_cmd_list.o				\
 				make_pipeline.o				\
-				switch_stdio.o				\
+				close_pipeline.o			\
+				get_pipe_fd.o				\
 				redirection.o				\
+				here_doc.o					\
+				switch_stdio.o				\
 				free_two_dimensional.o		\
 				parse.o						\
 				signal.o					\
