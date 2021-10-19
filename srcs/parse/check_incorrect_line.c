@@ -31,6 +31,10 @@ static int	check_incorrect_case(char *line, int i)
 	if (is_redirection(line[i]) && check_redirection(line, i))
 		return (TRUE);
 	return (FALSE);
+	//; or \
+	//더블 파이프
+	//리다이렉션 <> >< or >>>처럼 3개 이상인 경우
+	//체크
 }
 
 int	check_incorrect_line(char *line)
