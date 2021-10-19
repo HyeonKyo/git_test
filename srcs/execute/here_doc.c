@@ -9,23 +9,15 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 
 	if (pipe(pipe_fd) == -1)
 		return (-1);
-	while (1)
+	while (TRUE)
 	{
-		if (g_exit_code == -424242)
-		{
-			printf("@@exit flag!@@\n");
+		str = readline(">");//readline으로 변경
+		if (str == NULL || g_exit_code == -424242
+			|| strncmp(str, limiter, ft_strlen(limiter)) == 0)
 			break ;
-		}
-		if (get_next_line(0, &str))//gnl 함수로 표준입력 받기
-		{
-			if (strncmp(str, limiter, ft_strlen(limiter)) == 0)//사용자가 limiter 입력하면 break
-				break ;
-			ft_putstr_fd(str, pipe_fd[WRITE]);//받은 문자열을 파이프에 저장
-			ft_putstr_fd("\n", pipe_fd[WRITE]);
-			free(str);
-		}
-		else
-			break ;
+		ft_putendl_fd(str, pipe_fd[WRITE]);//받은 문자열을 파이프에 저장
+		free(str);
+		str = NULL;
 	}
 	info->pipex.is_here_doc = 0;
 	signal(SIGINT, sig_handler);
