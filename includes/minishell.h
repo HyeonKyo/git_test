@@ -189,7 +189,24 @@ int		builtin(char **cmd, t_info *info, int *fd);
 void	free_double_string(char **list);
 
 //parsing
+//util
 int		is_special(char c);
+t_type	check_type(char c);
+int		find_separator(char *line, int idx);
+
+char	**quote_split(char *cmd);
+
+void	init_quote_data(t_quote *data);
+int		check_incorrect_line(char *line);
+
+char	*fillin_buf(char *buf, char *origin, t_info *info);
+
+int		find_separator(char *line, int idx);
+
+char	*arrange_quote(char *line, int *start_idx, int sep_idx, t_info *info); 
+
+void	make_command(char *line, t_info *info);
+
 int		parse_line(char *line, t_info *info);
 
 //env_list, utils
