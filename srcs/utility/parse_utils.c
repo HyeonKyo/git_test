@@ -27,8 +27,6 @@ t_type	is_redirection(char c)
 	return (FALSE);
 }
 
-
-
 t_type	check_type(char c)
 {
 	if (c == '\"')

@@ -61,14 +61,22 @@ OBJS_LST	=	main.o						\
 				here_doc.o					\
 				switch_stdio.o				\
 				free_two_dimensional.o		\
+				arrange_quote.o				\
+				check_incorrect_line.o		\
+				fillin_buffer.o				\
+				make_command.o				\
 				parse.o						\
+				pre_processing_line.o		\
 				signal.o					\
 				error.o						\
 				env_list.o					\
 				env_utils.o					\
 				get_next_line.o				\
 				get_next_line_utils.o		\
-				list.o
+				list.o						\
+				parse_utils.o				\
+				parse_utils2.o
+				
 OBJS		=	$(addprefix $(OBJS_DIR), $(OBJS_LST))
 
 # =============================================================================

@@ -192,7 +192,9 @@ void	free_double_string(char **list);
 //parsing
 //util
 int		is_special(char c);
+t_type	is_redirection(char c);
 t_type	check_type(char c);
+int		is_separator(char c);
 int		find_separator(char *line, int idx);
 
 char	**quote_split(char *cmd);
@@ -202,9 +204,8 @@ int		check_incorrect_line(char *line);
 
 char	*fillin_buf(char *buf, char *origin, t_info *info);
 
-int		find_separator(char *line, int idx);
-
 char	*arrange_quote(char *line, int *start_idx, int sep_idx, t_info *info); 
+char	*pre_processing(char *line, t_info *info);
 
 void	make_command(char *line, t_info *info);
 
