@@ -11,8 +11,8 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
-extern	g_exit_code;
+#include <stdio.h>//지우기
+extern	int g_exit_code;
 
 void	gnl_strcpy(char *dest, char *src, size_t size)
 {
