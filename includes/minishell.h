@@ -45,7 +45,7 @@
 # define BUF_SIZE 20000
 # define ISODD 1
 
-# define MAX_FD 256
+# define CMD_NOT_FND 127
 
 /*
 ** =============================================================================
@@ -147,7 +147,7 @@ typedef struct s_info
 //execute
 void	execute_command_main(t_info *info);
 void	execute_command(t_info *info, int depth);
-void	execute_execve_function(t_info *info, int depth);
+int		execute_execve(t_info *info, int depth);
 int		is_builtin_command(t_info *info);
 
 void	get_pipe_fd(t_info *info, int depth, int fd[]);
@@ -159,6 +159,7 @@ void	close_pipeline(t_info *info);
 
 //redirection
 int		redirection(t_info *info, int fd[]);
+int		here_doc(t_info *info, char *limiter, int fd[]);
 
 //free
 void	free_two_dimensional(char **two_dimensional);
