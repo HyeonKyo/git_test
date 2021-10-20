@@ -45,7 +45,7 @@
 # define BUF_SIZE 20000//한 명령어(인자)가 받을 수 있는 문자열의 길이
 # define ISODD 1
 
-# define CMD_NOT_FND 127
+# define CMD_NOT_FOUND 127
 
 /*
 ** =============================================================================
@@ -160,7 +160,7 @@ int		is_builtin_command(t_info *info);
 
 void	get_pipe_fd(t_info *info, int depth, int fd[]);
 void	switch_stdio(t_info *info, int fd_stdin, int fd_stdout);
-void	get_cmd_list(t_info *info);
+int		get_cmd_list(t_info *info);
 
 void	make_pipeline(t_info *info);
 void	close_pipeline(t_info *info);
@@ -212,7 +212,7 @@ int		check_incorrect_line(char *line);
 
 char	*fillin_buf(char *buf, char *origin, t_info *info);
 
-char	*arrange_quote(char *line, int *start_idx, int sep_idx, t_info *info); 
+char	*arrange_quote(char *line, int *start_idx, int sep_idx, t_info *info);
 char	*pre_processing(char *line, t_info *info);
 
 void	make_command(char *line, t_info *info);

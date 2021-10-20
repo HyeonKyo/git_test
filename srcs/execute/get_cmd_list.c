@@ -4,7 +4,6 @@ void	malloc_cmd_list(t_info *info)
 {
 	int		cnt;
 	t_lst	*cur;
-	t_lst	*next;
 
 	cnt = 0;
 	cur = info->cmd_lst[info->cmd_sequence].text;
@@ -16,11 +15,10 @@ void	malloc_cmd_list(t_info *info)
 	info->cmd_list = (char **)malloc(sizeof(char *) * (cnt + 1));
 }
 
-void	get_cmd_list(t_info *info)
+int	get_cmd_list(t_info *info)
 {
 	int		cnt;
 	t_lst	*cur;
-	t_lst	*next;
 
 	cnt = 0;
 	malloc_cmd_list(info);
@@ -36,4 +34,7 @@ void	get_cmd_list(t_info *info)
 		cur = cur->next;
 	}
 	info->cmd_list[cnt] = NULL;
+	if (info->cmd_list[0])
+		return (NORMAL);
+	return (ERROR);
 }
