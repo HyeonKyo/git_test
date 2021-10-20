@@ -131,6 +131,7 @@ void	export(char **cmd, t_info *info)
 		free_double_string(info->env_list);
 		make_env_double_string(info);
 	}
+	set_environment_path(info);
 }
 
 /*
