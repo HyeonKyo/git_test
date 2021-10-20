@@ -173,7 +173,7 @@ int		here_doc(t_info *info, char *limiter, int fd[]);
 void	free_two_dimensional(char **two_dimensional);
 
 //builtin
-int		cd(char *path, t_info *info);
+void	cd(char *path, t_info *info);
 int		pwd(int *fd);
 void	execute_exit(char **cmd);
 
@@ -240,6 +240,6 @@ int		error(void);
 void	merror(void *addr);
 void	error_message(char *cmd, char *arg, char *msg);
 
-int		get_next_line(int fd, char **line);
+void	set_environment_path(t_info *info);
 
 #endif

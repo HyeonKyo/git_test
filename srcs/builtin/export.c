@@ -131,6 +131,8 @@ void	export(char **cmd, t_info *info)
 		free_double_string(info->env_list);
 		make_env_double_string(info);
 	}
+	free(info->env_path);//**여기 좀 더 생각해보기
+	set_environment_path(info);
 }
 
 /*

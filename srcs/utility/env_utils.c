@@ -38,7 +38,7 @@ char	*get_env_value(char *key, t_info *info)//key문자열의 복사본 리턴, 
 
 	cur = check_listin(key, info);
 	if (cur == NULL)
-		return(NULL);
+		return (NULL);
 	ret = ft_strdup(cur->value);
 	merror(ret);
 	return (ret);

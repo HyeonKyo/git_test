@@ -19,6 +19,7 @@ LINE_CLEAR	=	"\x1b[1A\x1b[M"
 
 CC			=	gcc
 CFLAGS		=	-g -fsanitize=address -lreadline -L$(HOME)/.brew/opt/readline/lib -I$(HOME)/.brew/opt/readline/include
+# -g -fsanitize=address -lreadline -L$(HOME)/.brew/opt/readline/lib -I$(HOME)/.brew/opt/readline/include
 RM			=	rm -rf
 
 # =============================================================================
@@ -71,8 +72,6 @@ OBJS_LST	=	main.o						\
 				error.o						\
 				env_list.o					\
 				env_utils.o					\
-				get_next_line.o				\
-				get_next_line_utils.o		\
 				list.o						\
 				parse_utils.o				\
 				parse_utils2.o
