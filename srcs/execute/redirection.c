@@ -31,7 +31,6 @@ int	redirection(t_info *info, int fd[])
 	int		reval;
 	char	**redi;
 
-	reval = NORMAL;
 	cur = info->cmd_lst[info->cmd_sequence].redi;
 	while (cur != NULL)
 	{
@@ -44,8 +43,11 @@ int	redirection(t_info *info, int fd[])
 			reval = input_redirection(info, redi[1], fd);
 		else if (redi[0][0] == '>')
 			reval = output_redirection(info, redi[1], fd);
-		if (reval)
+		if (reval == -1)
+		{
+			error_message(redi[1], NULL, "No such file or directory");
 			return (ERROR);
+		}
 		cur = cur->next;
 	}
 	return (NORMAL);

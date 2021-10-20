@@ -1,16 +1,18 @@
 #include "minishell.h"
 
-char	*get_cmd_path(char **env_path, char *cmd)
+char	*get_cmd_path(char **env_path, t_info *info)
 {
-	int		idx;
-	int		end;
-	char	*path_of_cmd;
-	struct stat file_stat;
+	int			idx;
+	char		*cmd;
+	char		*path_of_cmd;
+	struct stat	file_stat;
 
 	idx = 0;
-	end = sizeof(env_path);//1.이러면 환경변수 개수 만큼 출력이 되는지?
 	path_of_cmd = NULL;
-	while (idx < end)
+	cmd = info->cmd_lst[info->cmd_sequence].text->str;
+	if (info->cmd_lst[info->cmd_sequence].text->str[0] == '\0')
+		cmd = info->cmd_lst[info->cmd_sequence].text->next->str;
+	while (env_path[idx])
 	{
 		if (stat(cmd, &file_stat) == 0)
 			return (cmd);
@@ -51,13 +53,12 @@ int	execute_execve(t_info *info, int depth)
 
 	get_pipe_fd(info, depth, fd);
 	if (redirection(info, fd))
-		return (error());//비정상 종료 리턴
-	cmd_path = get_cmd_path(info->env_path, info->cmd_lst[depth].text->str);
+		return (ERROR);//비정상 종료 리턴
+	cmd_path = get_cmd_path(info->env_path, info);
+	if (get_cmd_list(info) == -1)
+		return (ERROR);
 	if (!is_builtin_command(info) || !(info->n_cmd == 1))
-	{
-		get_cmd_list(info);
 		switch_stdio(info, fd[READ], fd[WRITE]);
-	}
 	if (is_builtin_command(info))//**현교 : 이 if문 한 블록을 builtin함수 안에 넣어도 될듯?
 	{
 		builtin(info->cmd_list, info, fd);
@@ -70,7 +71,7 @@ int	execute_execve(t_info *info, int depth)
 	{
 		execve(cmd_path, info->cmd_list, info->env_list);
 		error_message(info->cmd_list[0], NULL,"command not found");
-		exit(CMD_NOT_FND);//127 나중에 디파인상수로
+		exit(CMD_NOT_FOUND);//127 나중에 디파인상수로
 		//비정상 종료 리턴
 	}
 	return (NORMAL);
