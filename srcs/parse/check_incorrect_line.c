@@ -17,7 +17,7 @@ static int	check_redirection(char *line, int i)
 	type = is_redirection(line[i]);
 	while (type == is_redirection(line[i + redi_cnt]) && line[i + redi_cnt])
 		redi_cnt++;
-	if (redi_cnt <= 2 && !is_redirection(line[i + redi_cnt]))
+	if (redi_cnt > 2 || is_redirection(line[i + redi_cnt]))
 		return (TRUE);
 	return (FALSE);
 }
@@ -26,7 +26,7 @@ static int	check_incorrect_case(char *line, int i)
 {
 	if ((line[i] == ';' || line[i] == '\\'))
 		return (TRUE);
-	if (check_type(line[i]) == PIPE && check_type(line[i + 1] == PIPE))
+	if (check_type(line[i]) == PIPE && check_type(line[i + 1]) == PIPE)
 		return (TRUE);
 	if (is_redirection(line[i]) && check_redirection(line, i))
 		return (TRUE);
@@ -56,7 +56,7 @@ int	check_incorrect_line(char *line)
 			data.dquote_cnt++;
 			data.dquote_flag ^= TRUE;
 		}
-		if (!data.squote_flag && !data.dquote_flag)
+		else if (!data.squote_flag && !data.dquote_flag)
 			if (check_incorrect_case(line, i))
 				return (TRUE);
 	}

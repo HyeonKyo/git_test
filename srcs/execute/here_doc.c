@@ -11,7 +11,7 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 		return (-1);
 	while (TRUE)
 	{
-		str = readline(">");//readline으로 변경
+		str = readline(">");//readline으로 변경, ctrl + d받으면 NULL
 		if (str == NULL || g_exit_code == -424242
 			|| strncmp(str, limiter, ft_strlen(limiter)) == 0)
 			break ;
@@ -20,7 +20,7 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 		str = NULL;
 	}
 	info->pipex.is_here_doc = 0;
-	signal(SIGINT, sig_handler);
+	// signal(SIGINT, sig_handler);
 	close(pipe_fd[WRITE]);
 	return (pipe_fd[READ]);//문자열이 저장된 파이프의 fd를 반환
 }
@@ -28,7 +28,7 @@ int	read_string_from_stdin(t_info *info, char *limiter)
 int	here_doc(t_info *info, char *limiter, int fd[])
 {
 	info->pipex.is_here_doc = 1;
-	signal(SIGINT, here_doc_handler);
+	// signal(SIGINT, here_doc_handler);
 	fd[READ] = read_string_from_stdin(info, limiter);//파이프의 fd 리턴, 에러 시 -1 리턴
 	if (fd[READ] == -1)
 		return (ERROR);

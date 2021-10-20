@@ -61,7 +61,10 @@ void	get_line(t_info *info)
 	if (line)
 		add_history(line);
 	if (parse_line(line, info))
-		error();
+	{
+		error();//syntex에러 메시지 출력으로 변경하기
+		return ;
+	}
 	execute_command_main(info);
 	return ;
 }
